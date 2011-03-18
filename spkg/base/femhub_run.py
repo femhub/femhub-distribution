@@ -35,6 +35,9 @@ Only use this mode to install FEMhub.
     parser.add_option("-i", "--install",
             action="store", type="str", dest="install", metavar="PACKAGE",
             default="", help="install a spkg package")
+    parser.add_option("-u", "--uninstall",
+            action="store", type="str", dest="uninstall", metavar="PACKAGE",
+            default="", help="uninstall a spkg package")
     parser.add_option("-f", "--force",
             action="store_true", dest="force",
             default=False, help="force the installation")
@@ -79,6 +82,7 @@ Only use this mode to install FEMhub.
     parser.add_option("--lab",
             action="store_true", dest="run_lab",
             default=False, help="Runs lab(auth=False)")
+
     options, args = parser.parse_args()
     if len(args) == 1:
         arg, = args
@@ -118,6 +122,12 @@ Only use this mode to install FEMhub.
         except PackageBuildFailed:
             pass
         return
+    if options.uninstall:
+		try:
+			uninstall_package(options.uninstall)
+		except:
+			pass
+		return
     if options.build:
         build(cpu_count=options.cpu_count)
         return
@@ -214,14 +224,14 @@ def cmd(s, capture=False):
 
 def create_package(package):
     packages = {
-        "libfemhub":      "git://github.com/hpfem/libfemhub.git",
-        "onlinelab":      "git://github.com/hpfem/femhub-online-lab.git",
-        "phaml":          "git://github.com/hpfem/phaml.git",
-        "arpack":         "git://github.com/hpfem/arpack.git",
+        "libfemhub": "git://github.com/hpfem/libfemhub.git",
+        "femhub_online_lab_sdk": "git://github.com/femhub/femhub-online-lab-sdk.git",
+        "phaml": "git://github.com/hpfem/phaml.git",
+        "arpack": "git://github.com/hpfem/arpack.git",
         "mesheditorflex": "git://github.com/hpfem/mesheditor-flex.git",
-        "cython":         "git://github.com/hpfem/cython.git",
-        "hermes2d":       "git://github.com/hpfem/hermes.git",
-            }
+        "cython": "git://github.com/hpfem/cython.git",
+        "hermes2d": "git://github.com/hpfem/hermes.git",
+        }
     if package not in packages:
         raise Exception("Unknown package")
     git_repo = packages[package]
@@ -321,6 +331,62 @@ def download_packages():
     packages = get_standard_packages()
     for p in packages:
         cmd("cd $FEMHUB_ROOT/spkg/standard; ../base/femhub-wget %s" % p)
+
+def uninstall_package(pkg):
+    import os, shutil
+    femhub_root = os.getenv('FEMHUB_ROOT')
+
+    path = os.path.join(femhub_root, "spkg/installed", pkg)
+
+    def get_items2remove(path):
+        items2remove = { 'DIR':[], 'FILE':[] }
+        f = open(path)
+
+        try:
+            line = f.readline().strip()
+            ndir = int(line.split('=')[1])
+
+            for n in range(ndir):
+                line = f.readline().strip()
+                items2remove['DIR'].append(line)
+
+            line = f.readline().strip()
+            nfile = int(line.split('=')[1])
+
+            for n in range(nfile):
+                line = f.readline().strip()
+                items2remove['FILE'].append(line)
+
+        except Exception:
+            items2remove = None
+        finally:
+            f.close()
+            return items2remove
+
+    if os.path.exists(path):
+        items2remove = get_items2remove(path)
+
+        if items2remove == None:
+            print "This Package do not support uninstall, delete it manually .."
+        else:
+            print "Unistalling package ..."
+            
+            try:
+                for d in items2remove['DIR']:
+                    print d
+                    shutil.rmtree(d,ignore_errors=True)
+
+                for f in items2remove['FILE']:
+                    print f
+                    os.unlink(f)
+
+                os.unlink(path)
+
+                print "Package Uninstalled .."
+            except Exception:
+                print "Error while uninstalling, file may not exixts or permission isssue ..."
+    else:
+        print pkg, ": Package not installed ... !"
 
 def install_package(pkg, install_dependencies=True, force_install=False,
         cpu_count=0):
@@ -548,7 +614,7 @@ def get_standard_packages(just_names=False):
             "python_daemon-1.5.5",
             "python_psutil-0.1.3",
             "python_tornado-f732f98",
-            "onlinelab-201012222506_c4b2eea",
+            "femhub_online_lab_sdk-864a5d9d4",
 
             "py-1.3.1",
 
