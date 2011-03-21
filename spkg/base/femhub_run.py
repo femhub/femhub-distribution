@@ -549,7 +549,7 @@ def get_dependencies(pkg):
             "pysqlite": ["python", "sqlite",],
             "python_tornado": ["python_pycurl"],
             "python_pycurl": ["curl"],
-            "onlinelab": ["python", "python_django", "simplejson", "pysqlite",
+            "femhub_online_lab_sdk": ["python", "python_django", "simplejson", "pysqlite",
                 "pyinotify", "python_argparse", "python_lockfile", "python_daemon", "python_psutil",
                 "python_tornado", "docutils", "pygments",
                 ],
@@ -681,7 +681,7 @@ def build(cpu_count=0):
             "h5py",
             "pytables",
             "nose",
-            "onlinelab",
+            "femhub_online_lab_sdk",
             "mesheditorflex",
             ]
     try:
