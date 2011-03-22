@@ -228,7 +228,7 @@ def create_package(package):
         "femhub_online_lab_sdk": "git://github.com/femhub/femhub-online-lab-sdk.git",
         "phaml": "git://github.com/hpfem/phaml.git",
         "arpack": "git://github.com/hpfem/arpack.git",
-        "mesheditorflex": "git://github.com/hpfem/mesheditor-flex.git",
+        "mesheditorflex": "git://github.com/femhub/mesheditor-flex.git",
         "cython": "git://github.com/hpfem/cython.git",
         "hermes2d": "git://github.com/hpfem/hermes.git",
         }
@@ -707,16 +707,10 @@ def run_lab(auth=False):
     print "Press CTRL+C to kill it"
     print
 
-    """
     if auth:
-        cmd("onlinelab core start --home=$SPKG_LOCAL/share/onlinelab/core-home")
+        cmd("onlinelab sdk start --no-daemon --auth=True --home=$SPKG_LOCAL/share/onlinelab/sdk-home")
     else:
-        cmd("onlinelab core start --no-auth --home=$SPKG_LOCAL/share/onlinelab/core-home")    
-
-    cmd("onlinelab service start --home=$SPKG_LOCAL/share/onlinelab/service-home")
-    """
-
-    cmd("onlinelab sdk start --no-daemon --home=$SPKG_LOCAL/share/onlinelab/sdk-home")
+        cmd("onlinelab sdk start --no-daemon --auth=False --home=$SPKG_LOCAL/share/onlinelab/sdk-home")
 
     try:
         wait_for_ctrl_c()
