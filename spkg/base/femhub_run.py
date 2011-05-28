@@ -605,7 +605,7 @@ def build(cpu_count=0):
             "hermes1d",
             "hermes2d",
             # requires: setupdocs>=1.0, doesn't work without a net...
-            "mayavi",
+            # "mayavi",
             "phaml",
             "libfemhub",
             "fipy",
