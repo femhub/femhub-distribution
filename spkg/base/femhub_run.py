@@ -605,7 +605,7 @@ def get_standard_packages(just_names=False):
             "pexpect-2.0.p3",
             "setuptools-0.6c11.p0",
             "libgpg_error-1.6.p2.f1",
-            "libgcrypt-1.4.3.p2",
+            "libgcrypt-1.4.0",
             "gnutls-2.2.1.p3",
 
             "pyinotify-0.7.2",
@@ -671,7 +671,7 @@ def build(cpu_count=0):
             "hermes1d",
             "hermes2d",
             # requires: setupdocs>=1.0, doesn't work without a net...
-            "mayavi",
+            # "mayavi",
             "phaml",
             "libfemhub",
             "fipy",
