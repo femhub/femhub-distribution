@@ -539,7 +539,7 @@ def get_standard_packages(just_names=False):
             "pexpect-2.0.p3",
             "setuptools-0.6c11.p0",
             "libgpg_error-1.6.p2.f1",
-            "libgcrypt-1.4.3.p2",
+            "libgcrypt-1.4.0",
             "gnutls-2.2.1.p3",
 
             "pyinotify-0.7.2",
