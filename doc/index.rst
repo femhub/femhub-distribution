@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-FEMhub Documentation
-======================
+FEMhub Distribution Documentation
+=================================
 
 .. toctree::
     :maxdepth: 2
@@ -12,7 +12,6 @@ FEMhub Documentation
     src/introduction
     src/femhub_lab
     src/install_run
-    src/intromesh
     src/hermes2d/tutorial-1
     src/fipy/tutorial-1
     src/fipy

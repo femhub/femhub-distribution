@@ -9,7 +9,7 @@ FiPy is an object oriented, partial differential equation (PDE) solver, written 
 
 The source of this example is the FiPy official `site <http://www.ctcms.nist.gov/fipy/>`_, where you can view the details.
 
-Let us take one of the FiPy examples here to learn how we can use it in the FEMhub lab.
+Let us take one of the FiPy examples here to learn how we can use it in NCLab.
 
 Example mesh20x20
 -----------------------
@@ -97,7 +97,7 @@ and test the value of the bottom-right corner cell.
         # Expected:
         ## 1
 
-To view the example in the FEMhub online lab `click here <http://lab.femhub.org/home/pub/23/>`_.
+To view the example in NCLab `click here <http://nclab.com/worksheets/638d764a021346c4a9ac8ba43bcdc72c/>`_.
 
 
 Example Diffusion - Electrostatics

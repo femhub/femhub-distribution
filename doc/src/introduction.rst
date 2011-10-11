@@ -2,30 +2,35 @@
 Introduction
 ============
 
-`FEMhub <http://femhub.org>`_ is an open source distribution of finite element codes with a unified
-Python interface. It is available for download as desktop application, but all codes
-are also automatically available in the `Online Numerical Methods Laboratory <http://lab.femhub.org>`_
-which is powered by high performance computers of the `hp-FEM group <http://hpfem.org>`_ at the
-`University of Nevada, Reno <http://unr.edu>`_. Every FEM code included in FEMhub can be used remotely via any web browser.
+`FEMhub Distribution <http://femhub.org>`_ is an open source collection of finite element (FEM) 
+codes with a unified Python interface. It is available for download as desktop application, 
+but all codes are also automatically available in `NCLab <http://nclab.com>`_. This makes 
+any code included in the Distribution automatically available via any web browser.
 
-FEMhub is available under the GPL license (Version 2, 1991).
+The FEMhub Distribution is available under the GPL license (Version 2, 1991).
+
+In this documentation, "FEMhub Distribution" will be often abbreviated by "FEMhub"
+for convenience.
 
 Prior to reading FEMhub documentation, we recommend that you install FEMhub using instructions
-in `this page <http://http://femhub.org/doc/src/install_run.html>`_, and subscribe to the `mailing list <http://groups.google.com/group/femhub/>`_.
+in `this page <http://http://femhub.org/doc/src/install_run.html>`_, and subscribe to the 
+`mailing list <http://groups.google.com/group/femhub/>`_.
 Our mailing list is an active place where you should get all answers quickly.
 
 The best way of reading this tutorial is to run the code at the same time.
 After making your way through the tutorial, you may want to view the published
-worksheets. After you go to the `online lab <http://lab.femhub.org>`_ click the
+worksheets in `NCLab <http://nclab.com>`_. After you are there, click the
 "Published worksheets" button at the bottom of the login window. There are a
 variety of examples that may help you to get started. If you
 create an interesting model using FEMhub packages, let us know and we
 will be happy to add it to the existing examples.
 
-The source code of FEMhub can be viewed in the `git repository <http://git.hpfem.org/femhub.git>`_.
-All the default packages of FEMhub (including the FEM Engines, Online Lab, and
-computing and visualization libraries) can be viewed and downloaded at `this page <http://femhub.org/codes.php>`_.
-The binaries of FEMhub can be downloaded from `here <http://femhub.org/pub>`_.
+The source code of the FEMhub Distribution can be viewed in the 
+`git repository <git@github.com:femhub/femhub-distribution.git>`_.
+All the default packages of FEMhub (including FEM Engines and
+computing and visualization libraries) can be viewed and downloaded at 
+`this page <http://femhub.org/codes.php>`_. The binaries of the FEMhub 
+Distribution can be downloaded from `here <http://femhub.org/pub>`_.
 
 Officially Supported Platforms
 ------------------------------
@@ -79,7 +84,8 @@ extract it with::
 Credit
 ------
 
-FEMhub and the FEMhub Online Lab was developed by the `hp-FEM group <http://hpfem.org>`_ at the Department of Mathematics ans Statistics, University of Nevada, Reno.
+The FEMhub Distribution is developed by the `hp-FEM group <http://hpfem.org>`_ at the Department 
+of Mathematics ans Statistics, University of Nevada, Reno.
 
 People who contributed to the FEMhub project, in the order of date of involvement:
 
@@ -96,6 +102,6 @@ People who contributed to the FEMhub project, in the order of date of involvemen
 * Quan Zou (University of Nevada, Reno, USA)
 * Pablo Angulo (Universidad Autonoma de Madrid)
 
-A few packages and files in FEMhub build system are taken from `Sage <http://www.sagemath.org>`_.
+A few packages and files in the FEMhub build system are taken from `Sage <http://www.sagemath.org>`_.
 
 Distributed under the terms of the GNU General Public License (GPL).

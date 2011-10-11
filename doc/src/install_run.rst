@@ -1,8 +1,9 @@
-Download, Install and Run FEMhub
-================================
-You can run download and install FEMhub easily on your local desktop.
+Download, Install and Run the FEMhub Distribution
+=================================================
+
+You can run download and install the FEMhub Distribution easily on your local desktop.
 Please follow the instructions below. If you do not want to download or
-install anything you can use our `FEMhub Online Numerical Methods Laboratory <http://lab.femhub.org/>`_.
+install anything you can use it in `NCLab <http://nclab.com/>`_.
 
 Instructions for Regular Users: Binary
 --------------------------------------
@@ -19,7 +20,7 @@ you are ready to go. For example, in ubuntu machine you would do the following:
     \$ wget http://femhub.org/pub/femhub-0.9.10.beta2-ubuntu64.tar.gz
     \$ tar xzf femhub-0.9.10.beta2-ubuntu64.tar.gz
 
-Then follow the instructions on running FEMhub below.
+Then follow the instructions on running the FEMhub Distribution below.
 
 Instructions for Developers: Building from Sources
 --------------------------------------------------
@@ -75,8 +76,8 @@ currently, so you also need to do::
 First make sure that you have git installed in your machine, and then issue the
 following commands to build FEMhub:
 ::
-    \$ git clone http://git.hpfem.org/git/femhub.git
-    \$ cd femhub
+    \$ git clone git@github.com:femhub/femhub-distribution.git
+    \$ cd femhub-distribution
     \$ ./femhub -d
     \$ make
 
@@ -112,8 +113,8 @@ WARNING: If "gcc -v" outputs 4.0.0, you  *must* upgrade XCode (free from Apple),
 First make sure that you have git installed in your machine, and then issue the
 following commands to build FEMhub:
 ::
-    \$ git clone http://git.hpfem.org/git/femhub.git
-    \$ cd femhub
+    \$ git clone git@github.com:femhub/femhub-distribution.git
+    \$ cd femhub-distribution
     \$ ./femhub -d
     \$ make
 
@@ -142,8 +143,8 @@ This is a bit tedious but you have to survive it. We would like to create one pa
 First make sure that you have git installed in your machine, and then issue the
 following commands to build FEMhub:
 ::
-    \$ git clone http://git.hpfem.org/git/femhub.git
-    \$ cd femhub
+    \$ git clone git@github.com:femhub/femhub-distribution.git
+    \$ cd femhub-distribution
     \$ ./femhub -d
     \$ make
 
@@ -189,5 +190,3 @@ Then point your browser to http://localhost:8000/
    :height: 400
    :alt: Screenshot of Online Lab
 
-For more information about using the online lab `click here
-<femhub_lab.html>`_.

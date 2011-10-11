@@ -3,36 +3,24 @@ FEMhub HowTo: Tips for Developers
 =================================
 Following tips are useful for developers.
 
-Browse Git Repository
-----------------------
-FEMhub (script and the build system) repository: http://git.hpfem.org/femhub.git
-
-FEMhub Online Lab repository: git clone http://git.hpfem.org/femhub-lab.git
-
-Libfemhub: http://git.hpfem.org/libfemhub.git
-
 Clone Git Repository
 --------------------
 
 To clone the repository of FEMhub (script and the build system):
 ::
-  \$ git clone http://git.hpfem.org/git/femhub.git
-
-To clone the repository of FEMhub Online Lab:
-::
-  \$ git clone http://git.hpfem.org/git/femhub-lab.git
+  \$ git clone git://github.com/femhub/femhub-distribution.git
 
 To clone the reopsitory of Libfemhub:
 ::
-  \$ git clone http://git.hpfem.org/git/libfemhub.git
+  \$ git clone git://github.com/femhub/libfemhub.git
 
 
 How to Test Patches
 -------------------
-Let's say that John asks you to pull the branch called ex_fem from git://github.com/andrsd/femhub.git and review.
+Let's say that John asks you to pull the branch called ex_fem from git://github.com/andrsd/femhub-distribution.git and review.
 First, add the remote link to John's repo by saying:
 ::
-  \$ git remote add john git://github.com/john/femhub.git
+  \$ git remote add john git://github.com/john/femhub-distribution.git
 
 Then, create in your repo a new local branch where the patches will be tested. Assuming that you are in your master branch, type:
 ::
@@ -51,8 +39,8 @@ How to Compile FEMhub from Git
 ------------------------------
 To compile from git (as opposed to the tarball):
 ::
-  \$ git clone http://git.hpfem.org/git/femhub.git
-  \$ cd femhub
+  \$ git clone git://github.com/femhub/femhub-distribution.git
+  \$ cd femhub-distribution
   \$ ./femhub -d
   \$ make
 
@@ -61,13 +49,13 @@ Creating New FEMhub Release
 ---------------------------
 How to create a new release:
 ::
-  \$ git clone http://git.hpfem.org/git/femhub.git
-  \$ cd femhub
+  \$ git clone git://github.com/femhub/femhub-distribution.git
+  \$ cd femhub-distribution
   \$ ./femhub -d
   \$ vim spkg/base/femhub-run  # edit the version & date in the banner
   \$ git ci -a -m "FEMhub version bumped to 0.9.9"
   \$ git tag femhub-0.9.9
-  \$ git push --tags remote_repo:/home/git/repos/femhub.git master  #replace
+  \$ git push --tags remote_repo:/home/git/repos/femhub-distribution.git master  #replace
   "remote_repo" with remote repository where you want to push
   \$ cd ..
   \$ cp -a femhub femhub-0.9.9
@@ -91,7 +79,7 @@ In cygwin, do
   make
   local/bin/sage-win-copy
 
-and run femhub by double-cclicking on the `femhub-windows` (bat) file in the root directory. If "http" doesn't work on windows, clone from: git://github.com/certik/femhub.git
+and run femhub by double-cclicking on the `femhub-windows` (bat) file in the root directory. 
 
 
 Create and Test FEMhub Packages
@@ -184,7 +172,6 @@ First clone the appropriate repository:
 
 Currently, the packages developed via Git are:
 ::
-    Online Lab (PACKAGE_NAME = "femhub-online-lab"), git repository.
     Libfemhub (PACKAGE_NAME = "libfemhub"), git repository.
     Hermes (PACKAGE_NAME = "hermes"), git repository.
     Mesh Editor (PACKAGE_NAME = "mesheditor-flex"), git repository.
@@ -216,10 +203,6 @@ You can install the package directly from the internet too. For example, to inst
   \$ ./femhub -i http://femhub.org/stpack/http:/fipy-2.1-51f1360.spkg
 
 Then you can test whether your package worked correctly in FEMhub. You can test your patches without creating spkg tar by following the instructions below.
-
-You may receive the following message when tying to install any package:
-::
-    Package 'onlinelab' is already installed
 
 To force the installation of the new package, type the following:
 ::

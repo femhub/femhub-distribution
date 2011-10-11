@@ -99,36 +99,24 @@ It does not matter if the mesh becomes irregular, in fact, arbitrarily irregular
 meshes are at the heart of Hermes:
 ::
 
-      # perform some sample initial refinements
-      mesh.refine_all_elements()          # refines all elements
-      mesh.refine_towards_vertex(3, 4)    # refines mesh towards vertex #3 (4x)
-      mesh.refine_towards_boundary(2, 4)  # refines all elements along boundary 2 (4x)
-      #mesh.refine_element(86, 0);        # Refines element #86 isotropically.
-      #mesh.refine_element(112, 0);       # Refines element #112 isotropically.
-      #mesh.refine_element(84, 2);        # Refines element #84 anisotropically.
-      #mesh.refine_element(114, 1);       # Refines element #114 anisotropically.
+    # perform some sample initial refinements
+    mesh.refine_all_elements()          # refines all elements
+    mesh.refine_towards_vertex(3, 4)    # refines mesh towards vertex #3 (4x)
+    mesh.refine_towards_boundary(2, 4)  # refines all elements along boundary 2 (4x)
+    #mesh.refine_element(86, 0);        # Refines element #86 isotropically.
+    #mesh.refine_element(112, 0);       # Refines element #112 isotropically.
+    #mesh.refine_element(84, 2);        # Refines element #84 anisotropically.
+    #mesh.refine_element(114, 1);       # Refines element #114 anisotropically.
 
-You can also convert triangles to quads and vice versa
-::
-  mesh.convert_triangles_to_quads()
-  mesh.convert_quads_to_triangles()
+You can also convert triangles to quads and vice versa::
 
-The following code illustrates how to visualize the mesh using the class MeshView:
-::
+    mesh.convert_triangles_to_quads()
+    mesh.convert_quads_to_triangles()
+
+The following code illustrates how to visualize the mesh using the class MeshView::
 
     # Display the Mesh
     mesh.plot(filename="a.png")
-
-and you will see the following output
-
-    .. image:: img/meshlab.png
-       :align: center
-       :width: 400
-       :height: 400
-       :alt: Image of the mesh created via the MeshView class.
-
-To view this example published on FEMhub online lab click `here <http://nb.femhub.org/pub/62>`_.
-
 
 Example Poisson Equation
 ------------------------
@@ -206,10 +194,10 @@ Then you can use Mesh.create() method to create a mesh. It takes four lists
 You can try various types of initial mesh refinements.
 ::
 
-      # perform some sample initial refinements
-      mesh.refine_all_elements()          # refines all elements
-      mesh.refine_towards_vertex(3, 4)    # refines mesh towards vertex #3 (4x)
-      mesh.refine_towards_boundary(2, 4)  # refines all elements along boundary 2 (4x)
+    # perform some sample initial refinements
+    mesh.refine_all_elements()          # refines all elements
+    mesh.refine_towards_vertex(3, 4)    # refines mesh towards vertex #3 (4x)
+    mesh.refine_towards_boundary(2, 4)  # refines all elements along boundary 2 (4x)
 
 
 We can now state our problem in the following way:
@@ -274,13 +262,13 @@ using the ScalarView class:
     view = ScalarView("Solution")
     view.show(sln, lib="mayavi", filename="a.png", notebook=True)
 
-You can visualize the mesh using the MeshView class:
-::
+You can visualize the mesh using the MeshView class::
+
     # Display the Mesh
     mesh.plot(filename="b.png")
  
-Furthermore, you can position the images by using the following html codes:
-::
+Furthermore, you can position the images by using the following html codes::
+
     # Positioning the images
     print """<html><table border=1><tr><td><span style="position: relative;"><img src="cell://a.png" ></span></td><td><img src="cell://b.png" width="540" height="405"></td></tr></table></html>"""
 
@@ -292,7 +280,6 @@ The following figure shows the output.
    :height: 400
    :alt: Solution of the Poisson equation.
 
-To view this example published on FEMhub online lab click `here <http://nb.femhub.org/pub/56>`_.
 
 Example Dirichlet BC
 --------------------
@@ -318,100 +305,100 @@ they need to be incorporated while the space is set up.
 The user can set boundary conditions by:
 ::
 
-  set_bc(space)
+    set_bc(space)
 
 The space initialization can look as follows:
 ::
 
-  space = H1Space(mesh, shapeset)
-  space.set_uniform_order(P_INIT)      # PINIT is initial polynomial degree in all elements
+    space = H1Space(mesh, shapeset)
+    space.set_uniform_order(P_INIT)      # PINIT is initial polynomial degree in all elements
 
-Following is the full code that you can run in the Online Lab:
+Following is the full code that you can run in NCLab:
 ::
 
-  P_INIT = 2              # Initial polynomial degree in all elements
-  UNIFORM_REF_LEVEL = 2   # Number of initial uniform mesh refinements
+    P_INIT = 2              # Initial polynomial degree in all elements
+    UNIFORM_REF_LEVEL = 2   # Number of initial uniform mesh refinements
 
-  # Import modules
-  from hermes2d import (Mesh, MeshView, H1Shapeset, PrecalcShapeset, H1Space,
-         LinSystem, Solution, ScalarView, WeakForm, DummySolver)
-  from hermes2d.examples.c04 import set_bc
-  from hermes2d.forms import set_forms
+    # Import modules
+    from hermes2d import (Mesh, MeshView, H1Shapeset, PrecalcShapeset, H1Space,
+           LinSystem, Solution, ScalarView, WeakForm, DummySolver)
+    from hermes2d.examples.c04 import set_bc
+    from hermes2d.forms import set_forms
 
-  # Initialize the mesh
-  mesh = Mesh()
+    # Initialize the mesh
+    mesh = Mesh()
 
-  # Create a mesh from a list of nodes, elements, boundary and nurbs.
-  mesh.create([
-         [0, -1],
-         [1, -1],
-         [-1, 0],
-         [0, 0],
-         [1, 0],
-         [-1, 1],
-         [0, 1],
-         [0.707106781, 0.707106781]
-     ], [
-         [0, 1, 4, 3, 0],
-         [3, 4, 7, 0],  
-         [3, 7, 6, 0],
-         [2, 3, 6, 5, 0]
-     ], [
-         [0, 1, 1],
-         [1, 4, 2],
-         [3, 0, 4],
-         [4, 7, 2],
-         [7, 6, 2],
-         [2, 3, 4],
-         [6, 5, 2],
-         [5, 2, 6]
-     ], [
-         [4, 7, 45],
-         [7, 6, 45]
-     ])
+    # Create a mesh from a list of nodes, elements, boundary and nurbs.
+    mesh.create([
+           [0, -1],
+           [1, -1],
+           [-1, 0],
+           [0, 0],
+           [1, 0],
+           [-1, 1],
+           [0, 1],
+           [0.707106781, 0.707106781]
+       ], [
+           [0, 1, 4, 3, 0],
+           [3, 4, 7, 0],  
+           [3, 7, 6, 0],
+           [2, 3, 6, 5, 0]
+       ], [
+           [0, 1, 1],
+           [1, 4, 2],
+           [3, 0, 4],
+           [4, 7, 2],
+           [7, 6, 2],
+           [2, 3, 4],
+           [6, 5, 2],
+           [5, 2, 6]
+       ], [
+           [4, 7, 45],
+           [7, 6, 45]
+       ])
 
-  # Initial mesh refinements
-  for i in range(UNIFORM_REF_LEVEL): mesh.refine_all_elements()
+    # Initial mesh refinements
+    for i in range(UNIFORM_REF_LEVEL): mesh.refine_all_elements()
  
-  # Initialize the shapeset and the cache
-  shapeset = H1Shapeset()
-  pss = PrecalcShapeset(shapeset)
+    # Initialize the shapeset and the cache
+    shapeset = H1Shapeset()
+    pss = PrecalcShapeset(shapeset)
 
-  # Create an H1 space
-  space = H1Space(mesh, shapeset)
-  space.set_uniform_order(P_INIT)
+    # Create an H1 space
+    space = H1Space(mesh, shapeset)
+    space.set_uniform_order(P_INIT)
 
-  # Set boundary conditions
-  set_bc(space)
+    # Set boundary conditions
+    set_bc(space)
 
-  # Enumerate degrees of freedom
-  space.assign_dofs()
+    # Enumerate degrees of freedom
+    space.assign_dofs()
 
-  # Initialize the discrete problem
-  wf = WeakForm()
-  set_forms(wf, -4)
+    # Initialize the discrete problem
+    wf = WeakForm()
+    set_forms(wf, -4)
 
-  # Initialize the linear system and solver
-  solver = DummySolver()
-  sys = LinSystem(wf, solver)
-  sys.set_spaces(space)
-  sys.set_pss(pss)
+    # Initialize the linear system and solver
+    solver = DummySolver()
+    sys = LinSystem(wf, solver)
+    sys.set_spaces(space)
+    sys.set_pss(pss)
 
-  # Assemble the stiffness matrix and solve the system
-  sys.assemble()
-  sln = Solution()
-  sys.solve_system(sln)
+    # Assemble the stiffness matrix and solve the system
+    sys.assemble()
+    sln = Solution()
+    sys.solve_system(sln)
 
-  # Display the solution
-  sln.plot(filename="a.png")
+    # Display the solution
+    sln.plot(filename="a.png")
 
-  # Display the mesh
-  mesh.plot(space=space, filename="b.png")
+    # Display the mesh
+    mesh.plot(space=space, filename="b.png")
 
-  # Positioning the images
-  print """<html><table border=1><tr><td><img src="cell://a.png"></span></td><td><img src="cell://b.png" width="540" height="405"></td></tr></table></html>"""
+    # Positioning the images
+    print """<html><table border=1><tr><td><img src="cell://a.png"></span></td><td><img src="cell://b.png" width="540" height="405"></td></tr></table></html>"""
 
-The output of the above code in the Online Lab is like this:
+The output of the above code in NCLab is like this:
 
 .. image:: ../img/dirichlet.png
    :align: center
@@ -446,26 +433,24 @@ surface integrals. In the case of the linear form $l(v)$, this means
     l(v) = \sum_m l_m^{\,\rm vol}(v) + \sum_n l_n^{\,\rm surf}(v).
 
 We have already seen volumetric linear forms in example 03-poisson. 
-Surface linear forms are implemented similarly, and will be added to the WeakForm by the following code:
+Surface linear forms are implemented similarly, and will be added to the WeakForm by the following code::
 
-::
-
-  # Initialize the discrete problem
-  wf = WeakForm(1)
-  set_forms(wf, -1)
-  set_forms_surf(wf) 
+    # Initialize the discrete problem
+    wf = WeakForm(1)
+    set_forms(wf, -1)
+    set_forms_surf(wf) 
 
 
 Note that the mesh is refined towards the re-entrant corner in order to 
 capture the singular gradient.
 ::
 
-	# Initial mesh refinements
-	mesh.refine_towards_vertex(3, CORNER_REF_LEVEL) 
+    # Initial mesh refinements
+    mesh.refine_towards_vertex(3, CORNER_REF_LEVEL) 
 
-The full code that you can run in the Online Lab is as follows:
-::
-	# Import modules
+The full code that you can run in NCLab is as follows::
+
+        # Import modules
 	from hermes2d import Mesh, MeshView, H1Shapeset, PrecalcShapeset, H1Space, \
 		LinSystem, Solution, ScalarView, WeakForm, DummySolver
 	from hermes2d.examples.c05 import set_bc, set_forms
@@ -549,11 +534,11 @@ The full code that you can run in the Online Lab is as follows:
 	# Positioning the images
 	print """<html><table border=1><tr><td><img src="cell://a.png"></span></td><td><img src="cell://b.png" width="540" height="405"></td></tr></table></html>"""
 
-After running the above code in the Online Lab you should see the following output:
+After running the above code in NCLab you should see the following output:
 
 .. image:: ../img/neumann.png
    :align: left
-   :width:75% 
+   :width: 75% 
    :alt: Solution of the Neumann problem.
 
 Example BC-Newton
@@ -570,14 +555,14 @@ material.
 Analogous to Neumann conditions, Newton conditions yield surface integrals. However,
 this time they are both in the bilinear form and in the linear form.
 
-The following parameters can be changed
-::
+The following parameters can be changed::
+
 	P_INIT = 3               # uniform polynomial degree in the mesh
 	UNIFORM_REF_LEVEL = 2    # number of initial uniform mesh refinements
 	CORNER_REF_LEVEL = 12    # number of mesh refinements towards the re-entrant corner
 
-The full code for the example is:
-::
+The full code for the example is::
+
 	# Import modules
 	from hermes2d import Mesh, MeshView, H1Shapeset, PrecalcShapeset, H1Space, \
 		LinSystem, WeakForm, DummySolver, Solution, ScalarView
@@ -654,7 +639,7 @@ The full code for the example is:
 	# Display the mesh
 	mesh.plot(space=space, filename="b.png")
 
-After running the above code in the Online Lab you should see the following output:
+After running the above code in NCLab you should see the following output:
 
 .. image:: ../img/newton.png
    :align: center
@@ -676,13 +661,13 @@ equipped with Dirichlet and/or Neumann boundary conditions. Its goal is to show 
 use space-dependent coefficients and how to define quadrature orders explicitly.
 Domain: arbitrary
 
-The following parameters can be changed
-::
+The following parameters can be changed::
+
 	P_INIT = 2             # Initial polynomial degree of all mesh elements.
 	INIT_REF_NUM = 4       # Number of initial uniform refinements
 
-The full code for the example is:
-::
+The full code for the example is::
+
 	# Import modules
 	from hermes2d import Mesh, MeshView, OrderView, H1Shapeset, PrecalcShapeset, H1Space, \
 		LinSystem, WeakForm, DummySolver, Solution, ScalarView, VonMisesFilter, \
@@ -734,7 +719,7 @@ The full code for the example is:
 	# Positioning the images
 	print """<html><table border=1><tr><td><span><img src="cell://a.png"></span></td><td><img src="cell://b.png" width="540" height="405"></td></tr></table></html>"""
 
-After running the above code in the Online Lab you should see the following output:
+After running the above code in NCLab you should see the following output:
 
 .. image:: ../img/general.png
    :align: center
