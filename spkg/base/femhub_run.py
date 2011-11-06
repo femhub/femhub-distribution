@@ -1,26 +1,50 @@
 #! /usr/bin/env python
 
-import os
-import sys
 from time import sleep
 from glob import glob
 from os.path import expandvars
 from optparse import OptionParser
 import tempfile
+import os
+import sys
 import subprocess
 import time
+import platform
+import shutil
 
-version = "0.9.10.beta1"
-release_date = "November 21, 2010"
+version = "1.0"
+release_date = "November 6, 2011"
+
+# -better support for binary and source build methods for FEMhub
+DISTRIB_ID = platform.linux_distribution()[0]
+DISTRIB_RELEASE = platform.linux_distribution()[1]
+DISTRIB_CODENAME = platform.linux_distribution()[2]
+ARCH = platform.architecture()[0]
+
+
+def get_root_path():
+    return os.environ.get("FEMHUB_ROOT")
+
+
+http_host = "http://femhub.org/stpack/"
+http_deb_bin_path = "femhub_deb/" + DISTRIB_ID.lower() + "/" + DISTRIB_RELEASE + "/" + ARCH + "/"
+http_deb_src_path = "femhub_deb/source/"
+http_spkg_path = "femhub_spkg/"
+local_pkg_path = get_root_path() + os.sep + "spkg" + os.sep + "standard"
+FEMHUB_LOCAL = get_root_path() + os.sep + "local"
+USE_BINARY_DEB = False
 
 class CmdException(Exception):
     pass
 
+
 class PackageBuildFailed(Exception):
     pass
 
+
 class PackageNotFound(Exception):
     pass
+
 
 def main():
     systemwide_python = (os.environ["FEMHUB_SYSTEMWIDE_PYTHON"] == "yes")
@@ -98,8 +122,7 @@ Only use this mode to install FEMhub.
         arg1, arg2 = args
         if arg1 == "install":
             try:
-                install_package(arg2, cpu_count=options.cpu_count,
-                        force_install=options.force)
+                install_package(arg2)
             except PackageBuildFailed:
                 pass
             return
@@ -111,10 +134,11 @@ Only use this mode to install FEMhub.
         print "Too many arguments"
         sys.exit(1)
 
-
     if options.download:
-        download_packages()
-        return
+        #download_spkg_packages()
+        #return
+        print "Deprecated. Packages will be downloaded in the build process."
+        sys.exit(1)
     if options.install:
         try:
             install_package(options.install, cpu_count=options.cpu_count,
@@ -123,11 +147,11 @@ Only use this mode to install FEMhub.
             pass
         return
     if options.uninstall:
-		try:
-			uninstall_package(options.uninstall)
-		except:
-			pass
-		return
+        try:
+            uninstall_package(options.uninstall)
+        except:
+            pass
+        return
     if options.build:
         build(cpu_count=options.cpu_count)
         return
@@ -198,6 +222,7 @@ Only use this mode to install FEMhub.
     else:
         start_femhub()
 
+
 def setup_cpu(cpu_count):
     if cpu_count == 0:
         try:
@@ -207,6 +232,7 @@ def setup_cpu(cpu_count):
             cpu_count = 1
     if cpu_count > 1:
         os.environ["MAKEFLAGS"] = "-j %d" % cpu_count
+
 
 def cmd(s, capture=False):
     s = expandvars(s)
@@ -221,6 +247,32 @@ def cmd(s, capture=False):
     if r != 0:
         raise CmdException("Command '%s' failed with err=%d." % (s, r))
     return output
+
+
+def check_call(quiet, *popenargs, **kwargs):
+    if quiet == True:
+        fnull = open(os.devnull, 'w')
+        retcode = subprocess.call(stdout=fnull, stderr=fnull,
+                                    *popenargs, **kwargs)
+        fnull.close()
+    else:
+        retcode = subprocess.call(*popenargs, **kwargs)
+    if retcode == 0:
+        return
+    raise CmdException(retcode)
+
+
+def process_command(args, cwd=None):
+    if not isinstance(args, (list, tuple)):
+        raise RuntimeError("args passed must be in a list")
+    check_call(False, args, cwd=cwd)
+
+
+def process_command_quiet(args, cwd=None):
+    if not isinstance(args, (list, tuple)):
+        raise RuntimeError("args passed must be in a list")
+    check_call(True, args, cwd=cwd)
+
 
 def create_package(package):
     packages = {
@@ -267,15 +319,17 @@ def create_package(package):
     print
     print "Package created: %s" % (pkg_filename)
 
+
 def upload_package(package):
     cmd("cd $CUR; scp %s spilka.math.unr.edu:/var/www3/femhub.org/packages/femhub_st/" % (package))
     print "Package uploaded: %s" % (package)
+
 
 def release_binary():
     tmp = tempfile.mkdtemp()
     femhub_dir = "femhub-%s" % version
     print "Using temporary directory:", tmp
-    cur = cmd("echo $CUR", capture=True).strip()
+    cmd("echo $CUR", capture=True).strip()
     cmd("mkdir %s/%s" % (tmp, femhub_dir))
     print "Copying femhub into the temporary directory..."
     cmd("cp -r * %s/%s/" % (tmp, femhub_dir))
@@ -286,6 +340,7 @@ def release_binary():
     cmd("cp %s/%s.tar.gz ." % (tmp, femhub_dir))
     print
     print "Package created: %s.tar.gz" % (femhub_dir)
+
 
 def start_femhub(debug=False):
     if debug:
@@ -304,7 +359,7 @@ def start_femhub(debug=False):
     l += " " * (banner_length - len(l) - 1) + "|"
     banner += l + "\n" + "-" * banner_length + "\n"
 
-    def lab_wrapper(old = False, auth=True, *args, **kwargs):
+    def lab_wrapper(old=False, auth=True, *args, **kwargs):
         if old:
             from sagenb.notebook.notebook_object import lab
             lab(*args, **kwargs)
@@ -325,21 +380,22 @@ def start_femhub(debug=False):
         print "Starting the main loop..."
     IPython.Shell.start(user_ns=namespace).mainloop(banner=banner)
 
-def download_packages():
+
+def download_spkg_packages():
     print "Downloading standard spkg packages"
     cmd("mkdir -p $FEMHUB_ROOT/spkg/standard")
-    packages = get_standard_packages()
+    packages = get_build_list()
     for p in packages:
         cmd("cd $FEMHUB_ROOT/spkg/standard; ../base/femhub-wget %s" % p)
 
+
 def uninstall_package(pkg):
-    import os, shutil
     femhub_root = os.getenv('FEMHUB_ROOT')
 
     path = os.path.join(femhub_root, "spkg/installed", pkg)
 
     def get_items2remove(path):
-        items2remove = { 'DIR':[], 'FILE':[] }
+        items2remove = {'DIR': [], 'FILE': []}
         f = open(path)
 
         try:
@@ -370,11 +426,11 @@ def uninstall_package(pkg):
             print "This Package do not support uninstall, delete it manually .."
         else:
             print "Unistalling package ..."
-            
+
             try:
                 for d in items2remove['DIR']:
                     print d
-                    shutil.rmtree(d,ignore_errors=True)
+                    shutil.rmtree(d, ignore_errors=True)
 
                 for f in items2remove['FILE']:
                     print f
@@ -388,7 +444,8 @@ def uninstall_package(pkg):
     else:
         print pkg, ": Package not installed ... !"
 
-def install_package(pkg, install_dependencies=True, force_install=False,
+
+def install_package_old(pkg, install_dependencies=True, force_install=False,
         cpu_count=0):
     """
     Installs the package "pkg".
@@ -413,11 +470,10 @@ def install_package(pkg, install_dependencies=True, force_install=False,
     """
     if pkg.startswith("http") or pkg.startswith("www"):
         remote = True
-        import tempfile
         tmpdir = tempfile.mkdtemp()
         cmd("wget --directory-prefix=" + tmpdir + " " + pkg)
         pkg_name = os.path.split(pkg)
-        pkg = os.path.join(tmpdir,pkg_name[1])
+        pkg = os.path.join(tmpdir, pkg_name[1])
     else:
         remote = False
         try:
@@ -430,32 +486,43 @@ def install_package(pkg, install_dependencies=True, force_install=False,
         if not force_install:
             print "Package '%s' is already installed" % pkg_make_relative(pkg)
             return
+
     if install_dependencies:
         print "Installing dependencies for %s..." % pkg
         for dep in get_dependencies(pkg):
-            install_package(dep, install_dependencies=False,
+            install_package_old(dep, install_dependencies=False,
                     cpu_count=cpu_count)
-    print "Installing %s..." % pkg
-    femhub_scripts = ["femhub-env", "femhub-make_relative"]
-    setup_cpu(cpu_count)
-    # Create the standard POSIX directories:
-    for d in ["bin", "doc", "include", "lib", "man", "share"]:
-        cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
-    for script in femhub_scripts:
-        cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
-    try:
-        cmd("$FEMHUB_ROOT/spkg/base/femhub-spkg %s" % pkg)
-    except CmdException:
-        #print "Package %s failed to install" % pkg
-        raise PackageBuildFailed()
-    cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_make_relative(pkg))
+
+        print "Installing %s..." % pkg
+        femhub_scripts = ["femhub-env", "femhub-make_relative"]
+        setup_cpu(cpu_count)
+        # Create the standard POSIX directories:
+        for d in ["bin", "doc", "include", "lib", "man", "share"]:
+            cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
+        for script in femhub_scripts:
+            cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
+        try:
+            if pkg.endswith(".spkg"):
+                print("Installing FEMhub spkg: " + pkg)
+                cmd("$FEMHUB_ROOT/spkg/base/femhub-spkg %s" % pkg)
+            else:
+                print("Installing FEMhub deb: " + pkg)
+                install_deb_package_old(pkg)
+            cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_make_relative(pkg))
+        except CmdException:
+            #print "Package %s failed to install" % pkg
+            raise PackageBuildFailed()
 
     if remote:
-        from shutil import rmtree
-        rmtree(tmpdir)
+        shutil.rmtree(tmpdir)
+
+
+def install_deb_package_old(pkg):
+    # works only for source deb package with spkg-install script
+    cmd("dpkg -i %s" % pkg)
+
 
 def is_installed(pkg):
-    pkg = pkg_make_relative(pkg)
     candidates = glob(expandvars("$FEMHUB_ROOT/spkg/installed/%s" % pkg))
     if len(candidates) == 1:
         return True
@@ -464,8 +531,9 @@ def is_installed(pkg):
     else:
         raise Exception("Internal error: got more candidates in is_installed")
 
+
 def pkg_make_absolute(pkg):
-    if pkg.endswith(".spkg"):
+    if pkg.endswith(".spkg") or pkg.endswith(".deb"):
         if os.path.exists(pkg):
             return os.path.abspath(pkg)
 
@@ -495,10 +563,12 @@ def pkg_make_absolute(pkg):
 
     raise PackageNotFound("Ambiguous package name.")
 
+
 def pkg_make_relative(pkg):
     pkg = pkg_make_absolute(pkg)
     name, version = extract_name_version_from_path(pkg)
     return name
+
 
 def make_unique(l):
     m = []
@@ -507,16 +577,17 @@ def make_unique(l):
             m.append(item)
     return m
 
-def get_dependencies(pkg):
+
+def get_dependencies(pkg_name):
     """
-    Gets all (including indirect) dependencies for the package "pkg".
+    Gets all (including indirect) dependencies for the package "pkg_name".
 
     For simplicity, the dependency graph is currently hardwired in this
     function.
     """
-    pkg_name = pkg_make_relative(pkg)
+
     dependency_graph = {
-            "python": ["termcap", "zlib", "readline", "bzip2", "gnutls",
+            "python": ["termcap", "zlib", "bzip2", "gnutls",
                 "libpng"],
             "ipython": ["python"],
             "cython": ["python"],
@@ -543,16 +614,16 @@ def get_dependencies(pkg):
             "opencdk": ["zlib", "libgcrypt"],
             "gnutls": ["libgcrypt", "opencdk"],
             "python_gnutls": ["gnutls"],
-            "python_django": ["python",],
+            "python_django": ["python", ],
             "simplejson": ["python", "setuptools"],
-            "sqlite": ["python",],
-            "pysqlite": ["python", "sqlite",],
+            "sqlite": ["python", ],
+            "pysqlite": ["python", "sqlite", ],
             "python_tornado": ["python_pycurl"],
             "python_pycurl": ["curl"],
-            "femhub_online_lab_sdk": ["python", "python_django", "simplejson", "pysqlite",
-                "pyinotify", "python_argparse", "python_lockfile", "python_daemon", "python_psutil",
-                "python_tornado", "docutils", "pygments",
-                ],
+            #"femhub_online_lab_sdk": ["python", "python_django", "simplejson", "pysqlite",
+            #    "pyinotify", "python_lockfile", "python_daemon", "python_psutil",
+            #    "python_tornado", "docutils", "pygments",
+            #    ],
             "trilinos": ["python", "blas"],
             "proteus": ["numpy", "cython"],
             "phaml": ["blas", "lapack", "cmake", "numpy", "arpack"],
@@ -564,6 +635,87 @@ def get_dependencies(pkg):
         deps.append(dep)
     deps = make_unique(deps)
     return deps
+
+
+def get_build_list():
+    #FEMHUB_STANDARD = "http://femhub.org/stpack"
+    femhub_packages = [
+            "termcap-1.3.1.p1",
+            "zlib-1.2.5",
+            "python-2.7.2",
+            "cython-0.14.1.p3",
+            "twisted-9.0.p2",
+            "jinja-1.2.p0",
+            "jinja2-2.5.5",
+            "python_gnutls-1.1.4.p7",
+            "docutils-0.7.p0",
+            "pygments-1.4",
+            "sphinx-1.0.4.p6",
+            "lapack-20071123.p1",
+            "blas-20070724",
+            "scipy-0.9",
+            "freetype-2.3.5.p3",
+            "libpng-1.2.35.p3",
+            "opencdk-0.6.6.p5",
+
+            "ipython-0.10.0.2.p0",
+            "bzip2-1.0.5",
+            "pexpect-2.0.p3",
+            "setuptools-0.6.16",
+            "libgpg_error-1.6.p3",
+            "libgcrypt-1.4.4.p3",
+            "gnutls-2.2.1.p5",
+
+            "pyinotify-0.7.2",
+            "python_lockfile-0.8",
+            "python_daemon-1.5.5",
+            "python_psutil-0.1.3",
+            "python_tornado-f732f98",
+
+            "py-1.3.1",
+
+            "fortran-20100629",
+            "f2py-9de8d45",
+            "numpy-1.6.1",
+            "matplotlib-1.0.1.p0",
+            "sympy-0.6.4.p0",
+
+            "cmake-2.8.1.p2",
+            "judy-1.0.5.p1",
+            "mesa-7.8.2",
+            "configobj-4.5.3",
+            "pyparsing-1.5.2",
+            "swig-2.0.0",
+            "sfepy-2010.3",
+            "hermes1d-qw1zxc",
+            "pysparse-1.1-6301cea",
+            "phaml-201011190816_71974f0",
+            "arpack-201011191133_0ea3296",
+            "fipy-2.1-51f1360",
+            "libfemhub-201011294106_6e289eb",
+            "hdf5-1.8.5.p1",
+            "h5py-1.2.1.p1",
+            "pytables-2.1",
+            "nose-0.11.1.p0",
+            "python_django-1.2.1",
+            "simplejson-2.1.1",
+            "sqlite-3.7.5",
+            "pysqlite-2.6.0",
+            "curl",
+            "python_pycurl-7.19.0",
+            "umfpack-5.5.0",
+            ]
+    #packages = [FEMHUB_STANDARD + os.sep + p + ".spkg" for p in femhub_packages]
+    return femhub_packages
+
+
+def add_version_to_generic_name(pkg):
+    packages = get_build_list()
+    for p in packages:
+        if p.startswith(pkg) and p != pkg:
+            return p
+    return pkg
+
 
 def get_standard_packages(just_names=False):
     """
@@ -580,98 +732,137 @@ def get_standard_packages(just_names=False):
 
     FEMHUB_STANDARD = "http://femhub.org/stpack"
 
-    femhub_packages = [
-            "termcap-1.3.1.p1",
-            "zlib-1.2.5",
-            "python-2.6.4.p9",
-            "cython-201012090206_a60b316",
-            "twisted-9.0.p2",
-            "jinja-1.2.p0",
-            "jinja2-2.1.1.p0",
-            "python_gnutls-1.1.4.p7",
-            "docutils-0.5.p0",
-            "pygments-0.11.1.p0",
-            "sphinx-0.6.3.p4",
-            "lapack-20071123.p1",
-            "blas-20070724",
-            "scipy-0.8",
-            "freetype-2.3.5.p2",
-            "libpng-1.2.35.p2",
-            "opencdk-0.6.6.p5",
+    femhub_packages = []
 
-            "ipython-bzr1174",
-            "readline-6.0",
-            "bzip2-1.0.5",
-            "pexpect-2.0.p3",
-            "setuptools-0.6c11.p0",
-            "libgpg_error-1.6.p2.f1",
-            "libgcrypt-1.4.0",
-            "gnutls-2.2.1.p3",
-
-            "pyinotify-0.7.2",
-            "python_argparse-1.1",
-            "python_lockfile-0.8",
-            "python_daemon-1.5.5",
-            "python_psutil-0.1.3",
-            "python_tornado-f732f98",
-            "femhub_online_lab_sdk-864a5d9d4",
-
-            "py-1.3.1",
-
-            "fortran-814646f",
-            "f2py-9de8d45",
-            "numpy-1.5.0",
-            "matplotlib-0.99.1.p4",
-            "sympy-5d78c29",
-
-            "cmake-2.8.1.p2",
-            "judy-1.0.5.p1",
-            "mesa-7.4.4.p3",
-            "vtk-cvs-20090316-minimal.p6",
-            "configobj-4.5.3",
-            "mayavi-3.3.1.p2",
-            "pyparsing-1.5.2",
-            "swig-1.3.36",
-            "sfepy-2010.1",
-            "hermes1d-fb8163f",
-            "hermes2d-201012090547_4c365d1",
-            "pysparse-1.1-6301cea",
-            "phaml-201011190816_71974f0",
-            "arpack-201011191133_0ea3296",
-            "fipy-2.1-51f1360",
-            "libfemhub-201011294106_6e289eb",
-            "hdf5-1.6.9",
-            "h5py-1.2.1.p1",
-            "pytables-2.1",
-            "nose-0.11.1.p0",
-            "python_django-1.2.1",
-            "simplejson-2.1.1",
-            "sqlite-3.7.2",
-            "pysqlite-2.6.0",
-            "mesheditorflex-201012223301_aabc985",
-            "curl-7.21.1",
-            "python_pycurl-7.19.0",
-            "umfpack-5.5.0",
-            ]
+    for file in os.listdir("spkg/standard"):
+        if file.endswith(".spkg"):
+            femhub_packages.append(file.replace(".spkg", ""))
 
     if just_names:
         packages = \
                 [p + ".spkg" for p in femhub_packages]
     else:
         packages = \
-                [FEMHUB_STANDARD + "/" + p + ".spkg" for p in femhub_packages]
+                [FEMHUB_STANDARD + os.sep + p + ".spkg" for p in femhub_packages]
     return packages
+
+
+def download_pkg_from_our_repo(pkg):
+    path = os.path.dirname(pkg)
+    inst_dir = os.path.join(local_pkg_path, path)
+    process_command(["mkdir", "-p", inst_dir], cwd=get_root_path())
+    try:
+        print(http_host + pkg)
+        process_command_quiet(["wget", "-c", http_host + pkg], cwd=inst_dir)
+        return True
+    except CmdException:
+        return False
+
+
+def install_package(pkg):
+    # 1) test if already installed
+    # 2) test if already downloaded
+    # 3) download (deb bin, deb src, spkg src, apt-get src)
+    # 4) install
+    pkg_name, pkg_version = extract_name_version_from_path(os.path.basename(pkg))
+    if len(pkg_name) == 0:
+        pkg_name = pkg
+
+    if is_installed(pkg_name):
+        print "Package '%s' is already installed" % pkg_name
+        return
+
+    print "Installing %s..." % pkg
+    print "Installing dependencies for %s..." % pkg_name
+    for dep in get_dependencies(pkg_name):
+        install_package(dep)
+
+    if pkg.endswith(".spkg") or pkg.endswith(".deb"):
+        without_ext = os.path.splitext(os.path.basename(pkg))[0]
+    else:
+        pkg = add_version_to_generic_name(pkg)
+        without_ext = pkg
+
+    try:
+        if USE_BINARY_DEB == True and download_pkg_from_our_repo(http_deb_bin_path + without_ext + ".deb"):
+            print("binary package found")
+            pkg_path = os.path.join(local_pkg_path, http_deb_bin_path, without_ext + ".deb")
+            install_binary_deb(pkg_path)
+            cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+        elif download_pkg_from_our_repo(http_deb_src_path + without_ext + ".deb"):
+            print("source package found (deb)")
+            pkg_path = os.path.join(local_pkg_path, http_deb_src_path, without_ext + ".deb")
+            install_source_deb(pkg_path)
+            cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+        elif download_pkg_from_our_repo(http_spkg_path + without_ext + ".spkg"):
+            print("source package found (spkg)")
+            pkg_path = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
+            install_source_spkg(pkg_path)
+            cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+        else:
+            #apt-get
+            print("package not found, trying apt-get repo")
+            working_dir = tempfile.mkdtemp()
+            process_command(["apt-get", "source", pkg_name], cwd=working_dir)
+            dir = os.listdir(working_dir)
+            working_dir_project = os.path.join(os.path.normpath(working_dir), dir[0])
+            try:
+                process_command(["./configure","--prefix=$FEMHUB_LOCAL"], cwd=working_dir_project)
+                process_command(["make"], cwd=working_dir_project)
+                process_command(["make install"], cwd=working_dir_project)
+            except CmdException:
+                try:
+                    process_command(["./config","--prefix=$FEMHUB_LOCAL"], cwd=working_dir_project)
+                    process_command(["make"], cwd=working_dir_project)
+                    process_command(["make install"], cwd=working_dir_project)
+                except CmdException:
+                    print("Build from apt-get failed, error in configure script!")
+                    shutil.rmtree(working_dir)
+                    raise CmdException()
+            shutil.rmtree(working_dir)
+            cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+
+    except CmdException:
+        print "Package %s failed to install" % pkg
+        raise PackageBuildFailed()
+
+
+def install_binary_deb(filepath):
+    process_command(["dpkg", "-x", filepath, FEMHUB_LOCAL], cwd=FEMHUB_LOCAL)
+
+
+def install_source_deb(filepath):
+    #process_command(["sudo","dpkg", "-i", filepath], cwd=FEMHUB_LOCAL)
+    working_dir = tempfile.mkdtemp()
+    process_command(["dpkg", "-e", filepath, working_dir], cwd=working_dir)
+    process_command(["dpkg", "-x", filepath, working_dir], cwd=working_dir)
+    process_command(["sh", "postinst"], cwd=working_dir)
+    shutil.rmtree(working_dir)
+
+
+def install_source_spkg(filepath):
+    cmd("$FEMHUB_ROOT/spkg/base/femhub-spkg %s" % filepath)
+
 
 def build(cpu_count=0):
     print "Building FEMhub"
+
+    femhub_scripts = ["femhub-env", "femhub-make_relative"]
+    setup_cpu(cpu_count)
+    # Create the standard POSIX directories:
+    for d in ["bin", "doc", "include", "lib", "man", "share"]:
+        cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
+    for script in femhub_scripts:
+        cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
+
     # Only add the packages that you want to have in FEMhub. Don't add
     # dependencies (those are handled in the get_dependencies() function)
     packages_list = [
             "ipython",
             "hermes1d",
-            "hermes2d",
+            #"hermes2d",
             # requires: setupdocs>=1.0, doesn't work without a net...
-            # "mayavi",
+            #"mayavi",
             "phaml",
             "libfemhub",
             "fipy",
@@ -681,16 +872,16 @@ def build(cpu_count=0):
             "h5py",
             "pytables",
             "nose",
-            "femhub_online_lab_sdk",
-            "mesheditorflex",
+            #"femhub_online_lab_sdk",
             ]
     try:
         for pkg in packages_list:
-            install_package(pkg, cpu_count=cpu_count)
+            install_package(pkg)
         print
         print "Finished building FEMhub."
     except PackageBuildFailed:
         print "FEMhub build failed."
+
 
 def wait_for_ctrl_c():
     try:
@@ -698,6 +889,7 @@ def wait_for_ctrl_c():
             sleep(1)
     except KeyboardInterrupt:
         pass
+
 
 def run_lab(auth=False):
     """
@@ -708,18 +900,19 @@ def run_lab(auth=False):
     print
 
     if auth:
-        cmd("onlinelab sdk start --no-daemon --auth=True --home=$SPKG_LOCAL/share/onlinelab/sdk-home")
+        cmd("onlinelab sdk start --no-daemon --auth=True --home=$FEMHUB_LOCAL/share/onlinelab/sdk-home")
     else:
-        cmd("onlinelab sdk start --no-daemon --auth=False --home=$SPKG_LOCAL/share/onlinelab/sdk-home")
+        cmd("onlinelab sdk start --no-daemon --auth=False --home=$FEMHUB_LOCAL/share/onlinelab/sdk-home")
 
     try:
         wait_for_ctrl_c()
     finally:
         """
-        cmd("onlinelab core stop --home=$SPKG_LOCAL/share/onlinelab/core-home")
-        cmd("onlinelab service stop --home=$SPKG_LOCAL/share/onlinelab/service-home")
+        cmd("onlinelab core stop --home=$FEMHUB_LOCAL/share/onlinelab/core-home")
+        cmd("onlinelab service stop --home=$FEMHUB_LOCAL/share/onlinelab/service-home")
         """
-        cmd("onlinelab sdk stop --home=$SPKG_LOCAL/share/onlinelab/sdk-home")
+        cmd("onlinelab sdk stop --home=$FEMHUB_LOCAL/share/onlinelab/sdk-home")
+
 
 def extract_version(package_name):
     """
@@ -755,14 +948,15 @@ def extract_version(package_name):
     first_dash = package_name.find("-")
     last_dash = package_name.rfind("-")
     if first_dash == last_dash:
-        return package_name[first_dash+1:]
+        return package_name[first_dash + 1:]
     while not numeric(package_name[first_dash + 1]):
-        package_name = package_name[first_dash+1:]
+        package_name = package_name[first_dash + 1:]
         first_dash = package_name.find("-")
         last_dash = package_name.rfind("-")
         if first_dash == last_dash:
-            return package_name[first_dash+1:]
+            return package_name[first_dash + 1:]
     return package_name[first_dash + 1:]
+
 
 def extract_name_version(package_name):
     """
@@ -775,8 +969,9 @@ def extract_name_version(package_name):
 
     """
     version = extract_version(package_name)
-    name = package_name[:-len(version)-1]
+    name = package_name[:-len(version) - 1]
     return name, version
+
 
 def extract_name_version_from_path(p):
     """
@@ -789,9 +984,9 @@ def extract_name_version_from_path(p):
 
     """
     path, ext = os.path.splitext(p)
-    assert ext == ".spkg"
     directory, filename = os.path.split(path)
     return extract_name_version(filename)
+
 
 def command_update():
     # This doesn't work, because of the following error:
@@ -801,8 +996,9 @@ def command_update():
     #print "Updating the git repository"
     #cmd("git pull https://github.com/hpfem/femhub.git master")
 
-    download_packages()
+    download_spkg_packages()
     print "Done."
+
 
 def command_list():
     print "List of installed packages:"
