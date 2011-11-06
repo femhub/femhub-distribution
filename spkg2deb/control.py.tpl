@@ -1,10 +1,10 @@
-Package: {package}
+Package: #{package}
 Source:
-Version: {version} 
+Version: #{version}
 Section: python
 Priority: optional
-Maintainer: {name} <{email}>
-Homepage: {homepage}
-Architecture: {architecture}
-Depends: {depends}
-Description: {description}
+Maintainer: #{name} <#{email}>
+Homepage: #{homepage}
+Architecture: #{architecture}
+Depends: #{depends}
+Description: #{description}
