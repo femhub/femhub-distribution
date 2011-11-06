@@ -19,7 +19,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	$(MAKE) DESTDIR=$(CURDIR)/debian/{package} install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/#{package} install
 binary-arch: build install
 	# emptyness
 binary-indep: build install
