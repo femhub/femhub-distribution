@@ -10,6 +10,10 @@ def make_tarball(tarball_fname, directory, cwd=None):
     "create a tarball from a directory"
     if tarball_fname.endswith('.gz'):
         opts = 'czf'
+    elif tarball_fname.endswith('.bz2'):
+        opts = 'cjf'
+    elif tarball_fname.endswith('.spkg'):
+        opts = 'cjf'
     else:
         opts = 'cf'
     args = ['/bin/tar', opts, tarball_fname, directory]
