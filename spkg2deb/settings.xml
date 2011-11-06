@@ -6,7 +6,7 @@
     <email>solin.pavel@gmail.com</email>
     <architecture>all</architecture>
     <version>1.0.0</version>
-    <depends>python2.6 (>= 2.6.5)</depends>
+    <depends>debhelper (>= 8.0.0), autotools-dev</depends>
     <homepage>http://github.com/femhub/</homepage>
     <description><![CDATA[default description]]></description>
     <debug>0</debug>
