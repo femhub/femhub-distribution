@@ -38,7 +38,7 @@ PATH="$SAGE_ROOT:$SAGE_LOCAL/bin:$PATH" && export PATH
 
 # Setting project neutral envrironment variables for FEMhub
 SPKG_PACKAGES="$FEMHUB_ROOT/spkg" && export SPKG_PACKAGES
-SPKG_LOCAL="$FEMHUB_ROOT/local"   && export SPKG_LOCAL
+FEMHUB_LOCAL="$FEMHUB_ROOT/local"   && export FEMHUB_LOCAL
 SPKG_DATA="$FEMHUB_ROOT/data"     && export SPKG_DATA
 SPKG_DOC="$FEMHUB_ROOT/devel/sage/doc" && export SPKG_DOC
 
