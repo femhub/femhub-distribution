@@ -15,7 +15,7 @@
 #  variables are defined:
 #
 #      FEMHUB_ROOT   -- root directory of sage install
-#      SPKG_LOCAL  -- $FEMHUB_ROOT/local
+#      FEMHUB_LOCAL  -- $FEMHUB_ROOT/local
 #      SPKG_DATA   -- $FEMHUB_ROOT/data
 #      LIBRARY_PATH, PYTHONPATH, LD_LIBRARY_PATH, DYLD_LIBRARY_PATH
 #      CC, CXX, CFLAGS, CXXFLAGS, LDFLAGS, MAKE
