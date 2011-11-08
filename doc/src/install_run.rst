@@ -78,7 +78,6 @@ following commands to build FEMhub:
 ::
     \$ git clone git@github.com:femhub/femhub-distribution.git
     \$ cd femhub-distribution
-    \$ ./femhub -d
     \$ make
 
 
