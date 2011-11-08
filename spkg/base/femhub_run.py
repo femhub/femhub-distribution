@@ -26,7 +26,8 @@ def get_root_path():
     return os.environ.get("FEMHUB_ROOT")
 
 
-http_host = "http://femhub.org/stpack/"
+#http_host = "http://femhub.org/stpack/"
+http_host = "http://localhost/"
 http_deb_bin_path = "femhub_deb/" + DISTRIB_ID.lower() + "/" + DISTRIB_RELEASE + "/" + ARCH + "/"
 http_deb_src_path = "femhub_deb/source/"
 http_spkg_path = "femhub_spkg/"
@@ -122,6 +123,7 @@ Only use this mode to install FEMhub.
         arg1, arg2 = args
         if arg1 == "install":
             try:
+                setup_cpu(options.cpu_count)
                 install_package(arg2)
             except PackageBuildFailed:
                 pass
@@ -137,12 +139,12 @@ Only use this mode to install FEMhub.
     if options.download:
         #download_spkg_packages()
         #return
-        print "Deprecated. Packages will be downloaded in the build process."
+        print "Deprecated. Packages will be downloaded on the fly."
         sys.exit(1)
     if options.install:
         try:
-            install_package(options.install, cpu_count=options.cpu_count,
-                    force_install=options.force)
+            setup_cpu(options.cpu_count)
+            install_package(options.install)
         except PackageBuildFailed:
             pass
         return
@@ -232,6 +234,7 @@ def setup_cpu(cpu_count):
             cpu_count = 1
     if cpu_count > 1:
         os.environ["MAKEFLAGS"] = "-j %d" % cpu_count
+    return cpu_count
 
 
 def cmd(s, capture=False):
@@ -688,6 +691,7 @@ def get_build_list():
             "swig-2.0.0",
             "sfepy-2010.3",
             "hermes1d-qw1zxc",
+            "hermes2d-1.0",
             "pysparse-1.1-6301cea",
             "phaml-201011190816_71974f0",
             "arpack-201011191133_0ea3296",
@@ -836,6 +840,7 @@ def install_source_deb(filepath):
     working_dir = tempfile.mkdtemp()
     process_command(["dpkg", "-e", filepath, working_dir], cwd=working_dir)
     process_command(["dpkg", "-x", filepath, working_dir], cwd=working_dir)
+    process_command(["cat", "postinst"], cwd=working_dir)
     process_command(["sh", "postinst"], cwd=working_dir)
     shutil.rmtree(working_dir)
 
