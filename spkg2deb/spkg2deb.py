@@ -33,7 +33,7 @@ PACKAGES_FAILED = []
 PACKAGE_NAME = ""
 VERSION = ""
 AUTO_DEPS = True
-BUILD_BINARY = True
+BUILD_BINARY = False
 BUILD_SOURCE = True
 
 
@@ -64,9 +64,9 @@ def main():
     print("")
     parser = argparse.ArgumentParser(description='Convert spkg to deb:')
     parser.add_argument('-b', '--binary', action='store_true',
-    help='Builds only binary packages. Default is -bs')
+    help='Builds only binary packages. Default is -s')
     parser.add_argument('-s', '--source', action='store_true',
-    help='Builds only source packages. Default is -bs')
+    help='Builds only source packages.')
     parser.add_argument('-nodeps', '--nodeps', action='store_true',
     help='If you add this parameter to your command, it will not download' +
     ' any dependencies from apt-get repositories.')
@@ -101,6 +101,9 @@ def main():
         BUILD_SOURCE = False
     elif args.binary == False and args.source == True:
         BUILD_BINARY = False
+        BUILD_SOURCE = True
+    elif args.binary == True and args.source == True:
+        BUILD_BINARY = True
         BUILD_SOURCE = True
 
     if args.file != None:
@@ -412,8 +415,6 @@ def build_deb_source(working_dir, working_dir_project,
             deb_file = os.path.join(working_dir_project, deb_file)
         elif (os.path.exists(os.path.join(working_dir, deb_file))):
             deb_file = os.path.join(working_dir, deb_file)
-        else:
-            deb_file = "*.deb"
 
         process_command(["cp",
             os.path.abspath(deb_file), os.path.join(inst_path_src, deb_renamed)], cwd=working_dir)
@@ -422,6 +423,8 @@ def build_deb_source(working_dir, working_dir_project,
 
     except CalledProcessError:
         print("....error copying package to final destination!")
+        print(working_dir_project)
+        print(deb_file)
 
 
 def generate_deb_from_python(working_dir, working_dir_project,
