@@ -415,6 +415,10 @@ def build_deb_source(working_dir, working_dir_project,
             deb_file = os.path.join(working_dir_project, deb_file)
         elif (os.path.exists(os.path.join(working_dir, deb_file))):
             deb_file = os.path.join(working_dir, deb_file)
+        elif (os.path.exists(os.path.join(working_dir_project, PACKAGE_NAME + ".deb"))):
+            deb_file = os.path.join(working_dir_project, PACKAGE_NAME + ".deb")
+        elif (os.path.exists(os.path.join(working_dir, PACKAGE_NAME + ".deb"))):
+            deb_file = os.path.join(working_dir, PACKAGE_NAME + ".deb")
 
         process_command(["cp",
             os.path.abspath(deb_file), os.path.join(inst_path_src, deb_renamed)], cwd=working_dir)
