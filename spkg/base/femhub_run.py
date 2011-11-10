@@ -124,7 +124,7 @@ Only use this mode to install FEMhub.
         if arg1 == "install":
             try:
                 setup_cpu(options.cpu_count)
-                install_package(arg2)
+                install_package(arg2, force_install=options.force)
             except PackageBuildFailed:
                 pass
             return
@@ -144,7 +144,7 @@ Only use this mode to install FEMhub.
     if options.install:
         try:
             setup_cpu(options.cpu_count)
-            install_package(options.install)
+            install_package(options.install, force_install=options.force)
         except PackageBuildFailed:
             pass
         return
@@ -752,10 +752,16 @@ def get_standard_packages(just_names=False):
     return packages
 
 
-def download_pkg_from_our_repo(pkg):
+def download_pkg_from_our_repo(pkg, force_install=False):
     path = os.path.dirname(pkg)
     inst_dir = os.path.join(local_pkg_path, path)
     process_command(["mkdir", "-p", inst_dir], cwd=get_root_path())
+    if force_install == True:
+        try:
+            print("forced redownload of %s" %pkg)
+            process_command(["rm", "-f", os.path.join(inst_dir, pkg)], cwd=get_root_path())
+        except:
+            pass
     try:
         print(http_host + pkg)
         process_command_quiet(["wget", "-c", http_host + pkg], cwd=inst_dir)
@@ -764,7 +770,7 @@ def download_pkg_from_our_repo(pkg):
         return False
 
 
-def install_package(pkg):
+def install_package(pkg, force_install=False, install_dependencies=True):
     # 1) test if already installed
     # 2) test if already downloaded
     # 3) download (deb bin, deb src, spkg src, apt-get src)
@@ -773,14 +779,15 @@ def install_package(pkg):
     if len(pkg_name) == 0:
         pkg_name = pkg
 
-    if is_installed(pkg_name):
+    if force_install == False and is_installed(pkg_name):
         print "Package '%s' is already installed" % pkg_name
         return
 
     print "Installing %s..." % pkg
-    print "Installing dependencies for %s..." % pkg_name
-    for dep in get_dependencies(pkg_name):
-        install_package(dep)
+    if install_dependencies == True:
+        print "Installing dependencies for %s..." % pkg_name
+        for dep in get_dependencies(pkg_name):
+            install_package(dep, force_install, install_dependencies=False)
 
     if pkg.endswith(".spkg") or pkg.endswith(".deb"):
         without_ext = os.path.splitext(os.path.basename(pkg))[0]
@@ -789,17 +796,17 @@ def install_package(pkg):
         without_ext = pkg
 
     try:
-        if USE_BINARY_DEB == True and download_pkg_from_our_repo(http_deb_bin_path + without_ext + ".deb"):
+        if USE_BINARY_DEB == True and download_pkg_from_our_repo(http_deb_bin_path + without_ext + ".deb", force_install):
             print("binary package found")
             pkg_path = os.path.join(local_pkg_path, http_deb_bin_path, without_ext + ".deb")
             install_binary_deb(pkg_path)
             cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
-        elif download_pkg_from_our_repo(http_deb_src_path + without_ext + ".deb"):
+        elif download_pkg_from_our_repo(http_deb_src_path + without_ext + ".deb", force_install):
             print("source package found (deb)")
             pkg_path = os.path.join(local_pkg_path, http_deb_src_path, without_ext + ".deb")
             install_source_deb(pkg_path)
             cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
-        elif download_pkg_from_our_repo(http_spkg_path + without_ext + ".spkg"):
+        elif download_pkg_from_our_repo(http_spkg_path + without_ext + ".spkg", force_install):
             print("source package found (spkg)")
             pkg_path = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
             install_source_spkg(pkg_path)
