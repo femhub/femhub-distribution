@@ -662,7 +662,7 @@ def get_build_list():
             "libpng-1.2.35.p3",
             "opencdk-0.6.6.p5",
 
-            "ipython-0.10.0.2.p0",
+            "ipython-0.10.2.p0",
             "bzip2-1.0.5",
             "pexpect-2.0.p3",
             "setuptools-0.6.16",
@@ -847,7 +847,7 @@ def install_binary_deb(filepath):
 def install_source_deb(filepath):
     #process_command(["sudo","dpkg", "-i", filepath], cwd=FEMHUB_LOCAL)
     working_dir = tempfile.mkdtemp()
-    cmd("$FEMHUB_ROOT/spkg/base/femhub-deb %s" % filepath)
+    process_command(["./spkg/base/femhub-deb",filepath,working_dir],cwd=get_root_path())
     #process_command(["dpkg", "-e", filepath, working_dir], cwd=working_dir)
     #process_command(["dpkg", "-x", filepath, working_dir], cwd=working_dir)
     #process_command(["cat", "postinst"], cwd=working_dir)
