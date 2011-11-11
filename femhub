@@ -19,7 +19,9 @@ FEMHUB_ROOT="${FEMHUB_ROOT%/*}/"
 # Make root absolute:
 cd "$FEMHUB_ROOT"
 FEMHUB_ROOT=`pwd`
+FEMHUB_LOCAL="$FEMHUB_ROOT/local"
 export FEMHUB_ROOT
+export FEMHUB_LOCAL
 export CUR
 
 if [ ! -f "$FEMHUB_ROOT/local/bin/python" ]; then

@@ -48,6 +48,7 @@ class PackageNotFound(Exception):
 
 
 def main():
+    create_local_bash()
     systemwide_python = (os.environ["FEMHUB_SYSTEMWIDE_PYTHON"] == "yes")
     if systemwide_python:
         print """\
@@ -857,16 +858,20 @@ def install_source_spkg(filepath):
     cmd("$FEMHUB_ROOT/spkg/base/femhub-spkg %s" % filepath)
 
 
-def build(cpu_count=0):
-    print "Building FEMhub"
-
+def create_local_bash():
     femhub_scripts = ["femhub-env", "femhub-make_relative"]
-    setup_cpu(cpu_count)
     # Create the standard POSIX directories:
     for d in ["bin", "doc", "include", "lib", "man", "share"]:
         cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
     for script in femhub_scripts:
         cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
+
+
+def build(cpu_count=0):
+    print "Building FEMhub"
+
+    create_local_bash()
+    setup_cpu(cpu_count)
 
     # Only add the packages that you want to have in FEMhub. Don't add
     # dependencies (those are handled in the get_dependencies() function)
