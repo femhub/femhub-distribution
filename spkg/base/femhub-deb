@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+. "$FEMHUB_ROOT/local/bin/femhub-env"
+
+PKG_NAME=`echo "$1" | sed -e "s/\.deb$//"`
+PKG_NAME=`basename "$PKG_NAME"`
+PKG_SRC="$1"
+PKG_BASE=`echo "$PKG_NAME" | sed -e "s/-.*//"`
+
+cd $PKG_BASE
+dpkg -e $PKG_SRC
+dpkg -x $PKG_SRC
+sh postinst
