@@ -858,7 +858,7 @@ def download_package(pkg, force_install=False, install_dependencies=True):
     if install_dependencies == True:
         print "Installing dependencies for %s..." % pkg_name
         for dep in get_dependencies(pkg_name):
-            install_package(dep, force_install)
+            download_package(dep, force_install)
 
     if pkg.endswith(".spkg") or pkg.endswith(".deb"):
         without_ext = os.path.splitext(os.path.basename(pkg))[0]
