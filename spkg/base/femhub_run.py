@@ -867,8 +867,14 @@ def create_local_bash():
     for d in ["bin", "doc", "include", "lib", "man", "share", "usr"]:
         cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
 
-    cmd("ln -s $FEMHUB_ROOT/local/include $FEMHUB_ROOT/local/usr/include")
-    cmd("ln -s $FEMHUB_ROOT/local/lib $FEMHUB_ROOT/local/usr/lib")
+    try:
+        cmd("ln -s $FEMHUB_ROOT/local/include $FEMHUB_ROOT/local/usr/include")
+    except:
+        pass
+    try:
+        cmd("ln -s $FEMHUB_ROOT/local/lib $FEMHUB_ROOT/local/usr/lib")
+    except:
+        pass
 
     for script in femhub_scripts:
         cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
@@ -885,7 +891,7 @@ def build(cpu_count=0):
     packages_list = [
             "ipython",
             "hermes1d",
-            "hermes2d",
+            #"hermes2d",
             # requires: setupdocs>=1.0, doesn't work without a net...
             #"mayavi",
             "phaml",
