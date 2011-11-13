@@ -26,8 +26,8 @@ def get_root_path():
     return os.environ.get("FEMHUB_ROOT")
 
 
-#http_host = "http://femhub.org/stpack/"
-http_host = "http://localhost/"
+http_host = "http://femhub.org/stpack/"
+#http_host = "http://localhost/"
 http_deb_bin_path = "femhub_deb/" + DISTRIB_ID.lower() + "/" + DISTRIB_RELEASE + "/" + ARCH + "/"
 http_deb_src_path = "femhub_deb/source/"
 http_spkg_path = "femhub_spkg/"
@@ -709,7 +709,7 @@ def get_build_list():
             "curl",
             "python_pycurl-7.19.0",
             "umfpack-5.5.0",
-            "pyplasm-1.0.0",
+            "pyplasm-1.0",
             ]
     #packages = [FEMHUB_STANDARD + os.sep + p + ".spkg" for p in femhub_packages]
     return femhub_packages
