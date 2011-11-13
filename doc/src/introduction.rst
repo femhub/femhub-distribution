@@ -101,7 +101,6 @@ People who contributed to the FEMhub project, in the order of date of involvemen
 * Christopher Kees (U.S. Army Engineer Research and Development Center, Vicksburg, MS, USA)
 * Quan Zou (University of Nevada, Reno, USA)
 * Pablo Angulo (Universidad Autonoma de Madrid)
-
-A few packages and files in the FEMhub build system are taken from `Sage <http://www.sagemath.org>`_.
+* Lukas Satin (Technical University Ostrava, Czech Republic)
 
 Distributed under the terms of the GNU General Public License (GPL).
