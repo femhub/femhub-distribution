@@ -44,7 +44,7 @@ First import the required modules
 ::
 
     # Import modules
-    from hemres2d import Mesh, MeshView
+    from hermes2d import Mesh, MeshView
 
 Then you can use Mesh.create() method to create a mesh. It takes four lists
 (vertices, elements, boundaries, and curves) as arguments.
