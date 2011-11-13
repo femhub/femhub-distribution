@@ -140,8 +140,8 @@ Only use this mode to install FEMhub.
     if options.download:
         #download_spkg_packages()
         #return
-        print "Deprecated. Packages will be downloaded on the fly."
-        sys.exit(1)
+                setup_cpu(options.cpu_count)
+                download_packages()
     if options.install:
         try:
             setup_cpu(options.cpu_count)
@@ -841,6 +841,55 @@ def install_package(pkg, force_install=False, install_dependencies=True):
         print "Package %s failed to install" % pkg
         raise PackageBuildFailed()
 
+def download_package(pkg, force_install=False, install_dependencies=True):
+    # 1) test if already installed
+    # 2) test if already downloaded
+    # 3) download (deb bin, deb src, spkg src, apt-get src)
+    # 4) install
+    pkg_name, pkg_version = extract_name_version_from_path(os.path.basename(pkg))
+    if len(pkg_name) == 0:
+        pkg_name = pkg
+
+    if force_install == False and is_installed(pkg_name):
+        print "Package '%s' is already installed" % pkg_name
+        return
+
+    print "Installing %s..." % pkg
+    if install_dependencies == True:
+        print "Installing dependencies for %s..." % pkg_name
+        for dep in get_dependencies(pkg_name):
+            install_package(dep, force_install)
+
+    if pkg.endswith(".spkg") or pkg.endswith(".deb"):
+        without_ext = os.path.splitext(os.path.basename(pkg))[0]
+    else:
+        pkg = add_version_to_generic_name(pkg)
+        without_ext = pkg
+
+    try:
+        if USE_BINARY_DEB == True and download_pkg_from_our_repo(http_deb_bin_path + without_ext + ".deb", force_install):
+            print("binary package found")
+            pkg_path = os.path.join(local_pkg_path, http_deb_bin_path, without_ext + ".deb")
+            #install_binary_deb(pkg_path)
+            #cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+        elif download_pkg_from_our_repo(http_deb_src_path + without_ext + ".deb", force_install):
+            print("source package found (deb)")
+            pkg_path = os.path.join(local_pkg_path, http_deb_src_path, without_ext + ".deb")
+            #install_source_deb(pkg_path)
+            #cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+        elif download_pkg_from_our_repo(http_spkg_path + without_ext + ".spkg", force_install):
+            print("source package found (spkg)")
+            pkg_path = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
+            #install_source_spkg(pkg_path)
+            #cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+        else:
+            #apt-get
+            print("package not found, maybe try apt-get repo")
+
+    except CmdException:
+        print "Package %s failed to download" % pkg
+        raise PackageBuildFailed()
+
 
 def install_binary_deb(filepath):
     process_command(["dpkg", "-x", filepath, FEMHUB_LOCAL], cwd=FEMHUB_LOCAL)
@@ -878,6 +927,38 @@ def create_local_bash():
 
     for script in femhub_scripts:
         cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
+
+
+def download_packages():
+    print "Downloading FEMhub"
+
+    # Only add the packages that you want to have in FEMhub. Don't add
+    # dependencies (those are handled in the get_dependencies() function)
+    packages_list = [
+            "ipython",
+            "hermes1d",
+            #"hermes2d",
+            # requires: setupdocs>=1.0, doesn't work without a net...
+            #"mayavi",
+            "phaml",
+            "libfemhub",
+            "fipy",
+            "sfepy",
+            "sympy",
+            "hdf5",
+            "h5py",
+            "pytables",
+            "nose",
+            "pyplasm",
+            #"femhub_online_lab_sdk",
+            ]
+    try:
+        for pkg in packages_list:
+            download_package(pkg)
+        print
+        print "Download finished."
+    except PackageBuildFailed:
+        print "Download failed."
 
 
 def build(cpu_count=0):
