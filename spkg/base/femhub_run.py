@@ -26,8 +26,8 @@ def get_root_path():
     return os.environ.get("FEMHUB_ROOT")
 
 
-http_host = "http://femhub.org/stpack/"
-#http_host = "http://localhost/"
+#http_host = "http://femhub.org/stpack/"
+http_host = "http://localhost/"
 http_deb_bin_path = "femhub_deb/" + DISTRIB_ID.lower() + "/" + DISTRIB_RELEASE + "/" + ARCH + "/"
 http_deb_src_path = "femhub_deb/source/"
 http_spkg_path = "femhub_spkg/"
@@ -602,9 +602,9 @@ def get_dependencies(pkg_name):
             "numpy": ["python", "lapack", "blas"],
             "scipy": ["numpy"],
             "matplotlib": ["freetype", "libpng", "python", "numpy"],
-            "hermes1d": ["cmake", "scipy", "cython", "matplotlib"],
-            "hermes2d": ["cmake", "scipy", "judy", "cython", "matplotlib"],
-            "vtk-cvs": ["mesa", "cmake"],
+            "hermes1d": ["scipy", "cython", "matplotlib"],
+            "hermes2d": ["scipy", "judy", "cython", "matplotlib"],
+            "vtk-cvs": ["mesa"],
             "mayavi": ["python", "configobj", "vtk-cvs", "setuptools"],
             "pyparsing": ["python"],
             "pysparse": ["python"],
@@ -630,7 +630,7 @@ def get_dependencies(pkg_name):
             #    ],
             "trilinos": ["python", "blas"],
             "proteus": ["numpy", "cython"],
-            "phaml": ["blas", "lapack", "cmake", "numpy", "arpack"],
+            "phaml": ["blas", "lapack", "numpy", "arpack"],
             "umfpack": ["blas"],
             }
     deps = []
@@ -678,13 +678,13 @@ def get_build_list():
 
             "py-1.3.1",
 
-            "fortran-20100629",
+            "fortran-814646f",
             "f2py-9de8d45",
             "numpy-1.6.1",
             "matplotlib-1.0.1.p0",
             "sympy-0.6.4.p0",
 
-            "cmake-2.8.1.p2",
+            #"cmake-2.8.1.p2",
             "judy-1.0.5.p1",
             "mesa-7.8.2",
             "configobj-4.5.3",
@@ -788,7 +788,7 @@ def install_package(pkg, force_install=False, install_dependencies=True):
     if install_dependencies == True:
         print "Installing dependencies for %s..." % pkg_name
         for dep in get_dependencies(pkg_name):
-            install_package(dep, force_install, install_dependencies=False)
+            install_package(dep, force_install)
 
     if pkg.endswith(".spkg") or pkg.endswith(".deb"):
         without_ext = os.path.splitext(os.path.basename(pkg))[0]
@@ -847,7 +847,7 @@ def install_binary_deb(filepath):
 def install_source_deb(filepath):
     #process_command(["sudo","dpkg", "-i", filepath], cwd=FEMHUB_LOCAL)
     working_dir = tempfile.mkdtemp()
-    process_command(["./spkg/base/femhub-deb",filepath,working_dir],cwd=get_root_path())
+    cmd("$FEMHUB_ROOT/spkg/base/femhub-deb %s" % filepath)
     #process_command(["dpkg", "-e", filepath, working_dir], cwd=working_dir)
     #process_command(["dpkg", "-x", filepath, working_dir], cwd=working_dir)
     #process_command(["cat", "postinst"], cwd=working_dir)
