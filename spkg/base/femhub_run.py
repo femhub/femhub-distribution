@@ -632,6 +632,7 @@ def get_dependencies(pkg_name):
             "proteus": ["numpy", "cython"],
             "phaml": ["blas", "lapack", "numpy", "arpack"],
             "umfpack": ["blas"],
+            "pyplasm": ["PyOpenGL"]
             }
     deps = []
     for dep in dependency_graph.get(pkg_name, []):
@@ -709,6 +710,7 @@ def get_build_list():
             "curl",
             "python_pycurl-7.19.0",
             "umfpack-5.5.0",
+            "PyOpenGL-3.0.2a1",
             "pyplasm-1.0",
             ]
     #packages = [FEMHUB_STANDARD + os.sep + p + ".spkg" for p in femhub_packages]
@@ -862,8 +864,12 @@ def install_source_spkg(filepath):
 def create_local_bash():
     femhub_scripts = ["femhub-env", "femhub-make_relative"]
     # Create the standard POSIX directories:
-    for d in ["bin", "doc", "include", "lib", "man", "share"]:
+    for d in ["bin", "doc", "include", "lib", "man", "share", "usr"]:
         cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
+
+    cmd("ln -s $FEMHUB_ROOT/local/include $FEMHUB_ROOT/local/usr/include")
+    cmd("ln -s $FEMHUB_ROOT/local/lib $FEMHUB_ROOT/local/usr/lib")
+
     for script in femhub_scripts:
         cmd("cp $FEMHUB_ROOT/spkg/base/%s $FEMHUB_ROOT/local/bin/" % script)
 
@@ -891,6 +897,7 @@ def build(cpu_count=0):
             "h5py",
             "pytables",
             "nose",
+            "pyplasm",
             #"femhub_online_lab_sdk",
             ]
     try:
