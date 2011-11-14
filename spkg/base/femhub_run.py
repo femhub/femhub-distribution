@@ -799,20 +799,35 @@ def install_package(pkg, force_install=False, install_dependencies=True):
         without_ext = pkg
 
     try:
+        local_deb_bin=os.path.join(local_pkg_path, http_deb_bin_path, without_ext + ".deb")
+        local_deb = os.path.join(local_pkg_path, http_deb_src_path, without_ext + ".deb")
+        local_spkg = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
+        if (force_install == False):
+            # test if package has been already downloaded in local path
+            if (os.path.exists(local_deb_bin)):
+                install_binary_deb(local_deb_bin)
+                cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+                return
+            if (os.path.exists(local_deb)):
+                install_binary_deb(local_deb)
+                cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+                return
+            if (os.path.exists(local_spkg)):
+                install_binary_deb(local_spkg)
+                cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+                return
+
         if USE_BINARY_DEB == True and download_pkg_from_our_repo(http_deb_bin_path + without_ext + ".deb", force_install):
             print("binary package found")
-            pkg_path = os.path.join(local_pkg_path, http_deb_bin_path, without_ext + ".deb")
-            install_binary_deb(pkg_path)
+            install_binary_deb(local_deb_bin)
             cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
         elif download_pkg_from_our_repo(http_deb_src_path + without_ext + ".deb", force_install):
             print("source package found (deb)")
-            pkg_path = os.path.join(local_pkg_path, http_deb_src_path, without_ext + ".deb")
-            install_source_deb(pkg_path)
+            install_source_deb(local_deb)
             cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
         elif download_pkg_from_our_repo(http_spkg_path + without_ext + ".spkg", force_install):
             print("source package found (spkg)")
-            pkg_path = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
-            install_source_spkg(pkg_path)
+            install_source_spkg(local_spkg)
             cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
         else:
             #apt-get
