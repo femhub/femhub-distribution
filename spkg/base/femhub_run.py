@@ -809,11 +809,11 @@ def install_package(pkg, force_install=False, install_dependencies=True):
                 cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
                 return
             if (os.path.exists(local_deb)):
-                install_binary_deb(local_deb)
+                install_source_deb(local_deb)
                 cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
                 return
             if (os.path.exists(local_spkg)):
-                install_binary_deb(local_spkg)
+                install_source_spkg(local_spkg)
                 cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
                 return
 
