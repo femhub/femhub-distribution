@@ -913,7 +913,8 @@ def install_binary_deb(filepath):
 def install_source_deb(filepath):
     #process_command(["sudo","dpkg", "-i", filepath], cwd=FEMHUB_LOCAL)
     working_dir = tempfile.mkdtemp()
-    cmd("$FEMHUB_ROOT/spkg/base/femhub-deb %s" % filepath)
+    #cmd("$FEMHUB_ROOT/spkg/base/femhub-deb %s %s" % filepath % working_dir)
+    process_command(["./spkg/base/femhub-deb", filepath, working_dir], cwd=get_root_path())
     #process_command(["dpkg", "-e", filepath, working_dir], cwd=working_dir)
     #process_command(["dpkg", "-x", filepath, working_dir], cwd=working_dir)
     #process_command(["cat", "postinst"], cwd=working_dir)
