@@ -140,8 +140,9 @@ Only use this mode to install FEMhub.
     if options.download:
         #download_spkg_packages()
         #return
-                setup_cpu(options.cpu_count)
-                download_packages()
+        setup_cpu(options.cpu_count)
+        download_packages()
+        return
     if options.install:
         try:
             setup_cpu(options.cpu_count)
@@ -766,7 +767,7 @@ def download_pkg_from_our_repo(pkg, force_install=False):
         except:
             pass
     try:
-        print(http_host + pkg)
+        #print(http_host + pkg)
         process_command_quiet(["wget", "-c", http_host + pkg], cwd=inst_dir)
         return True
     except CmdException:
