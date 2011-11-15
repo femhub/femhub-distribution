@@ -592,7 +592,7 @@ def get_dependencies(pkg_name):
     """
 
     dependency_graph = {
-            "python": ["termcap", "zlib", "bzip2", "gnutls",
+            "python": ["termcap", "zlib",
                 "libpng"],
             "ipython": ["python"],
             "cython": ["python"],
@@ -618,7 +618,8 @@ def get_dependencies(pkg_name):
             "libgcrypt": ["libgpg_error"],
             "opencdk": ["zlib", "libgcrypt"],
             "gnutls": ["libgcrypt", "opencdk"],
-            "python_gnutls": ["gnutls"],
+            #"python_gnutls": ["gnutls"],
+            "python_gnutls": ["libgcrypt", "opencdk"],
             "python_django": ["python", ],
             "simplejson": ["python", "setuptools"],
             "sqlite": ["python", ],
