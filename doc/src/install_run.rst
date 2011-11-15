@@ -114,7 +114,6 @@ following commands to build FEMhub:
 ::
     \$ git clone git@github.com:femhub/femhub-distribution.git
     \$ cd femhub-distribution
-    \$ ./femhub -d
     \$ make
 
 Building in Microsoft Windows
@@ -144,7 +143,6 @@ following commands to build FEMhub:
 ::
     \$ git clone git@github.com:femhub/femhub-distribution.git
     \$ cd femhub-distribution
-    \$ ./femhub -d
     \$ make
 
 Building in Other Operating Systems
