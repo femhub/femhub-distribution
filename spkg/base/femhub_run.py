@@ -660,7 +660,7 @@ def get_build_list():
             "lapack-20071123.p1",
             "blas-20070724",
             "scipy-0.9",
-            "readline-6.0"
+            "readline-6.0",
             "freetype-2.3.5.p3",
             "libpng-1.2.35.p3",
             "opencdk-0.6.6.p5",
