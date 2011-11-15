@@ -592,8 +592,7 @@ def get_dependencies(pkg_name):
     """
 
     dependency_graph = {
-            "python": ["termcap", "zlib",
-                "libpng"],
+            "python": ["termcap", "zlib", "readline", "libpng"],
             "ipython": ["python"],
             "cython": ["python"],
             "sympy": ["python"],
@@ -661,6 +660,7 @@ def get_build_list():
             "lapack-20071123.p1",
             "blas-20070724",
             "scipy-0.9",
+            "readline-6.0"
             "freetype-2.3.5.p3",
             "libpng-1.2.35.p3",
             "opencdk-0.6.6.p5",
@@ -859,21 +859,14 @@ def install_package(pkg, force_install=False, install_dependencies=True):
         raise PackageBuildFailed()
 
 def download_package(pkg, force_install=False, install_dependencies=True):
-    # 1) test if already installed
-    # 2) test if already downloaded
-    # 3) download (deb bin, deb src, spkg src, apt-get src)
-    # 4) install
+    # download packages for offline installation
     pkg_name, pkg_version = extract_name_version_from_path(os.path.basename(pkg))
     if len(pkg_name) == 0:
         pkg_name = pkg
 
-    if force_install == False and is_installed(pkg_name):
-        print "Package '%s' is already installed" % pkg_name
-        return
-
-    print "Installing %s..." % pkg
+    print "Downloading %s..." % pkg
     if install_dependencies == True:
-        print "Installing dependencies for %s..." % pkg_name
+        print "Downloading dependencies for %s..." % pkg_name
         for dep in get_dependencies(pkg_name):
             download_package(dep, force_install)
 
@@ -935,11 +928,11 @@ def create_local_bash():
         cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
 
     try:
-        cmd("ln -s $FEMHUB_ROOT/local/include $FEMHUB_ROOT/local/usr/include")
+        process_command_quiet("ln","-s","$FEMHUB_ROOT/local/include $FEMHUB_ROOT/local/usr/include")
     except:
         pass
     try:
-        cmd("ln -s $FEMHUB_ROOT/local/lib $FEMHUB_ROOT/local/usr/lib")
+        process_command_quiet("ln","-s","$FEMHUB_ROOT/local/lib $FEMHUB_ROOT/local/usr/lib")
     except:
         pass
 
