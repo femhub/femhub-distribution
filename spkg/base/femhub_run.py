@@ -928,11 +928,11 @@ def create_local_bash():
         cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
 
     try:
-        process_command_quiet("ln","-s","$FEMHUB_ROOT/local/include $FEMHUB_ROOT/local/usr/include")
+        process_command_quiet("ln", "-s", "./include", "./usr/include", cwd=FEMHUB_LOCAL)
     except:
         pass
     try:
-        process_command_quiet("ln","-s","$FEMHUB_ROOT/local/lib $FEMHUB_ROOT/local/usr/lib")
+        process_command_quiet("ln", "-s", "./lib", "./usr/lib", cwd=FEMHUB_LOCAL)
     except:
         pass
 
