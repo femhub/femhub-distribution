@@ -923,16 +923,20 @@ def install_source_spkg(filepath):
 
 def create_local_bash():
     femhub_scripts = ["femhub-env", "femhub-make_relative"]
+
     # Create the standard POSIX directories:
     for d in ["bin", "doc", "include", "lib", "man", "share", "usr"]:
         cmd("mkdir -p $FEMHUB_ROOT/local/%s" % d)
 
+    # Recreate symlinks in ./local/usr/
+    process_command_quiet(["rm", "-f", "./usr/*"], cwd=FEMHUB_LOCAL)
     try:
-        process_command_quiet("ln", "-s", "./include", "./usr/include", cwd=FEMHUB_LOCAL)
+        process_command_quiet(["ln", "-sf", "../include", "include"], cwd=FEMHUB_LOCAL+os.sep+"usr")
     except:
         pass
     try:
-        process_command_quiet("ln", "-s", "./lib", "./usr/lib", cwd=FEMHUB_LOCAL)
+        #print("Creating local/usr/lib symlink")
+        process_command_quiet(["ln", "-sf", "../lib", "lib"], cwd=FEMHUB_LOCAL+os.sep+"usr")
     except:
         pass
 
