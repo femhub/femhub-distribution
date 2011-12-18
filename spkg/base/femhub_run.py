@@ -360,9 +360,6 @@ def start_femhub(debug=False):
     l = "| FEMhub Version %s, Release Date: %s" % (version, release_date)
     l += " " * (banner_length - len(l) - 1) + "|"
     banner = "-" * banner_length + "\n" + l + "\n"
-    l = "| Type lab() for the GUI."
-    l += " " * (banner_length - len(l) - 1) + "|"
-    banner += l + "\n" + "-" * banner_length + "\n"
 
     def lab_wrapper(old=False, auth=True, *args, **kwargs):
         if old:
@@ -804,6 +801,13 @@ def install_package(pkg, force_install=False, install_dependencies=True):
         local_deb_bin=os.path.join(local_pkg_path, http_deb_bin_path, without_ext + ".deb")
         local_deb = os.path.join(local_pkg_path, http_deb_src_path, without_ext + ".deb")
         local_spkg = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
+
+        #support for local packages with absolute path
+        if (os.path.exists(pkg)):
+                install_source_spkg(pkg)
+                cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+                return
+
         if (force_install == False):
             # test if package has been already downloaded in local path
             if (os.path.exists(local_deb_bin)):
