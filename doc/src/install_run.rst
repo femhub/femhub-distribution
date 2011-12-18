@@ -170,20 +170,10 @@ Go the femhub top directory, and just execute
 
  ./femhub
 
-from the command line, and type lab() after that.
+from the command line.
 ::
     \$ ./femhub
     ----------------------------------------------------------------------
     | Femhub Version 0.9.9, Release Date: 2010-05-05                     |
-    | Type lab() for the GUI.                                            |
     ----------------------------------------------------------------------
-    In [1]: lab()
-
-Then point your browser to http://localhost:8000/
-
-.. image:: img/femhub_lab.png
-   :align: center
-   :width: 600
-   :height: 400
-   :alt: Screenshot of Online Lab
 

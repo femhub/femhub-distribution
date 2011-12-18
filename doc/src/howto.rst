@@ -99,7 +99,7 @@ You can extract an spkg by typing
 ::
   \$ tar -jxvf packagename-version.spkg
 
-After you extract you will see a script file named ``spkg-install`` which contains the install script. Besides that you may sometimes see a directory ``src/``
+After you extract you will see a script file named ``spkg-install`` which contains the install script.
 
 The script ``spkg-install`` is run during installation of the FEMhub package. You can modify spkg-install according to your need.
 
@@ -113,15 +113,12 @@ There are two ways to create FEMhub packages:
 
 You may follow the following steps to create a new FEMhub spkg package:
 
-First create a directory like this:
+Create the package by typing:
 ::
-  \$ mkdir mypackage-version # first the name of your package and then version
-Then inside that directory put the script ``spkg-install``, and also create a directory ``src/``. Then put all your source codes within that ``src`` directory. Please see a sample of ``spkg-install`` script below.
+  \$ /path/to/femhub/util/create_package.py -d /path/to/your/project/
 
-Then you can create the package by typing:
-::
-  \$ cd ../    # go out of the mypackage-version directory you just created
-  \$ tar cjf mypackage-version.spkg mypackage-version
+This will create a package named project.spkg in your current working directory.
+Create_package.py script will detect cmake, make or python project and create appropriate spkg-install for you. If you want to supply some custom build commandsor the script could not determine your build system, you have to create spkg-install script in your project directory manually.
 
 After you create mypackage-version.spkg you can install it in FEMhub easily. To do so go to FEMhub top directory and type
 ::
@@ -129,8 +126,8 @@ After you create mypackage-version.spkg you can install it in FEMhub easily. To 
 
 A sample ``spkg-install`` script
 ::
-  if [ "$SPKG_LOCAL" = "" ]; then
-     echo "SPKG_LOCAL undefined ... exiting";
+  if [ "$FEMHUB_LOCAL" = "" ]; then
+     echo "FEMHUB_LOCAL undefined ... exiting";
      echo "Maybe run 'femhub --shell'?"
      exit 1
   fi
@@ -140,9 +137,9 @@ A sample ``spkg-install`` script
   PY_VER=`python -c "import sys;print '%d.%d' % sys.version_info[:2]"`
   echo "Detected Python version: $PY_VER"
 
-  cmake -DCMAKE_INSTALL_PREFIX="$SPKG_LOCAL" \
-      -DPYTHON_INCLUDE_PATH="$SPKG_LOCAL/include/python$PY_VER" \
-      -DPYTHON_LIBRARY="$SPKG_LOCAL/lib/python2.6/config/libpython2.6.dll.a" \
+  cmake -DCMAKE_INSTALL_PREFIX="$FEMHUB_LOCAL" \
+      -DPYTHON_INCLUDE_PATH="$FEMHUB_LOCAL/include/python$PY_VER" \
+      -DPYTHON_LIBRARY="$FEMHUB_LOCAL/lib/python2.6/config/libpython2.6.dll.a" \
     .
   if [ $? -ne 0 ]; then
      echo "Error configuring $PACKAGE_NAME."
@@ -161,7 +158,7 @@ A sample ``spkg-install`` script
      exit 1
   fi
 
-In the spkg-install script above you can see a variable SPKG_LOCAL which points to path/to/femhub/local.
+In the spkg-install script above you can see a variable FEMHUB_LOCAL which points to path/to/femhub/local.
 
 **(2) Using Git**
 
