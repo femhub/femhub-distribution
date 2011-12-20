@@ -13,7 +13,7 @@ import platform
 import shutil
 
 version = "1.0"
-release_date = "November 6, 2011"
+release_date = "December 20, 2011"
 
 # -better support for binary and source build methods for FEMhub
 DISTRIB_ID = platform.linux_distribution()[0]
@@ -803,8 +803,12 @@ def install_package(pkg, force_install=False, install_dependencies=True):
         local_spkg = os.path.join(local_pkg_path, http_spkg_path, without_ext + ".spkg")
 
         #support for local packages with absolute path
-        if (os.path.exists(pkg)):
+        if (os.path.exists(pkg) and pkg.endswith(".spkg")):
                 install_source_spkg(pkg)
+                cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
+                return
+        elif (os.path.exists(pkg) and pkg.endswith(".deb")):
+                install_binary_deb(pkg)
                 cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
                 return
 
