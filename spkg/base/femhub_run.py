@@ -592,15 +592,15 @@ def get_dependencies(pkg_name):
             "python": ["termcap", "zlib", "readline", "libpng"],
             "ipython": ["python"],
             "cython": ["python"],
+            "hermes": ["hermes-python"],
             "sympy": ["python"],
-            "lapack": ["fortran"],
-            "arpack": ["fortran"],
-            "blas": ["fortran", "lapack"],
-            "numpy": ["python", "lapack", "blas"],
+            #"lapack": ["fortran"],
+            #"arpack": ["fortran"],
+            #"blas": [ "fortran", "lapack"],
+            "numpy": ["python"],
             "scipy": ["numpy"],
             "matplotlib": ["freetype", "libpng", "python", "numpy"],
-            "hermes1d": ["scipy", "cython", "matplotlib"],
-            "hermes2d": ["scipy", "judy", "cython", "matplotlib"],
+            "hermes": ["scipy", "judy", "cython", "matplotlib"],
             "vtk-cvs": ["mesa"],
             "mayavi": ["python", "configobj", "vtk-cvs", "setuptools"],
             "pyparsing": ["python"],
@@ -626,10 +626,10 @@ def get_dependencies(pkg_name):
             #    "pyinotify", "python_lockfile", "python_daemon", "python_psutil",
             #    "python_tornado", "docutils", "pygments",
             #    ],
-            "trilinos": ["python", "blas"],
+            "trilinos": ["python"],
             "proteus": ["numpy", "cython"],
-            "phaml": ["blas", "lapack", "numpy", "arpack"],
-            "umfpack": ["blas"],
+            #"phaml": ["blas", "lapack", "numpy", "arpack"],
+            #"umfpack": ["blas"],
             "pyplasm": ["PyOpenGL"]
             }
     deps = []
@@ -646,7 +646,7 @@ def get_build_list():
             "termcap-1.3.1.p1",
             "zlib-1.2.5",
             "python-2.7.2",
-            "cython-0.14.1.p3",
+            "cython",
             "twisted-9.0.p2",
             "jinja-1.2.p0",
             "jinja2-2.5.5",
@@ -678,7 +678,7 @@ def get_build_list():
 
             "py-1.3.1",
 
-            "fortran-814646f",
+            #"fortran-814646f",
             "f2py-9de8d45",
             "numpy-1.6.1",
             "matplotlib-1.0.1.p0",
@@ -691,8 +691,8 @@ def get_build_list():
             "pyparsing-1.5.2",
             "swig-2.0.0",
             "sfepy-2010.3",
-            "hermes1d-qw1zxc",
-            "hermes2d-1.0",
+            #"hermes1d-qw1zxc",
+            "hermes",
             "pysparse-1.1-6301cea",
             "phaml-201011190816_71974f0",
             "arpack-201011191133_0ea3296",
@@ -755,6 +755,7 @@ def get_standard_packages(just_names=False):
 
 
 def download_pkg_from_our_repo(pkg, force_install=False):
+    print ("Package " + pkg + " at host: " + http_host)
     path = os.path.dirname(pkg)
     inst_dir = os.path.join(local_pkg_path, path)
     process_command(["mkdir", "-p", inst_dir], cwd=get_root_path())
@@ -765,7 +766,7 @@ def download_pkg_from_our_repo(pkg, force_install=False):
         except:
             pass
     try:
-        #print(http_host + pkg)
+        print(http_host + pkg)
         process_command_quiet(["wget", "-c", http_host + pkg], cwd=inst_dir)
         return True
     except CmdException:
@@ -804,6 +805,7 @@ def install_package(pkg, force_install=False, install_dependencies=True):
 
         #support for local packages with absolute path
         if (os.path.exists(pkg) and pkg.endswith(".spkg")):
+                print("Local spkg install: %s" % pkg)
                 install_source_spkg(pkg)
                 cmd("touch $FEMHUB_ROOT/spkg/installed/%s" % pkg_name)
                 return
@@ -959,7 +961,7 @@ def download_packages():
     # dependencies (those are handled in the get_dependencies() function)
     packages_list = [
             "ipython",
-            "hermes1d",
+            "hermes",
             #"hermes2d",
             # requires: setupdocs>=1.0, doesn't work without a net...
             #"mayavi",
@@ -994,7 +996,7 @@ def build(cpu_count=0):
     # dependencies (those are handled in the get_dependencies() function)
     packages_list = [
             "ipython",
-            "hermes1d",
+            "hermes",
             #"hermes2d",
             # requires: setupdocs>=1.0, doesn't work without a net...
             #"mayavi",

@@ -18,3 +18,8 @@ libxcursor-dev
 freeglut3-dev
 python-opengl
 libpng12-dev
+libblas*
+arpack++
+lapack*
+libxerces*
+libumfpack*
