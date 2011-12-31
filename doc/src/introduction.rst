@@ -5,11 +5,12 @@ Introduction
 `FEMhub Distribution <http://femhub.org>`_ is an open source collection of finite element (FEM) 
 codes with a unified Python interface. It is available for download as desktop application, 
 but all codes are also automatically available in `NCLab <http://nclab.com>`_. This makes 
-any code included in the Distribution automatically available via any web browser.
+any code included in the Distribution automatically available on the cloud and accessble 
+via any web browser (just avoid IE if you can).
 
-The FEMhub Distribution is available under the GPL license (Version 2, 1991).
+The FEMhub Distribution is available under the GNU Lesser General Public License (LGPL).
 
-In this documentation, "FEMhub Distribution" will be often abbreviated by "FEMhub"
+In this documentation, "FEMhub Distribution" will often be abbreviated by "FEMhub"
 for convenience.
 
 Prior to reading FEMhub documentation, we recommend that you install FEMhub using instructions
