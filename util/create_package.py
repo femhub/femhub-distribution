@@ -32,7 +32,7 @@ def main():
     if args.dir != None:
         for dir in args.dir:
             for file in os.listdir(dir):
-                if os.path.isfile(file) and file == "spkg-install":
+                if file == "spkg-install":
                     rewrite_file(os.path.join(dir, file))
                     installScriptFound = True
 
@@ -67,7 +67,7 @@ def rewrite_file(file):
 
 
 def generate_package(dir):
-    make_tarball(os.path.basename(dir + ".spkg"), os.path.basename(dir))
+    make_tarball(os.path.basename(dir) + ".spkg", os.path.abspath(dir))
 
 
 def generate_install_script(dir):
