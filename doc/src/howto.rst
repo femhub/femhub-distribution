@@ -197,7 +197,7 @@ You can install any spkg package in femhub directly by typing
 
 You can install the package directly from the internet too. For example, to install FiPy package you can type
 ::
-  \$ ./femhub -i http://femhub.org/stpack/http:/fipy-2.1-51f1360.spkg
+  \$ ./femhub -i http://femhub.org/stpack/fipy-2.1-51f1360.spkg
 
 Then you can test whether your package worked correctly in FEMhub. You can test your patches without creating spkg tar by following the instructions below.
 
