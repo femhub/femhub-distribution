@@ -6,6 +6,7 @@ from os.path import expandvars
 from optparse import OptionParser
 import tempfile
 import os
+import re
 import sys
 import subprocess
 import time
@@ -779,8 +780,10 @@ def install_package(pkg, force_install=False, install_dependencies=True):
     # 3) download (deb bin, deb src, spkg src, apt-get src)
     # 4) install
     pkg_name, pkg_version = extract_name_version_from_path(os.path.basename(pkg))
-    if len(pkg_name) == 0:
+    if len(pkg_name) == 0 or re.match("[^0-9]", pkg_version):
+        print("Detected package name: " + pkg)
         pkg_name = pkg
+
 
     if force_install == False and is_installed(pkg_name):
         print "Package '%s' is already installed" % pkg_name
