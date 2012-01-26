@@ -67,8 +67,7 @@ def rewrite_file(file):
 
 
 def generate_package(dir):
-    make_tarball(os.path.basename(dir) + ".spkg", os.path.abspath(dir))
-
+    make_tarball(os.path.basename(dir) + ".spkg", os.path.basename(dir))
 
 def generate_install_script(dir):
     makeLines = []
