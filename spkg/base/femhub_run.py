@@ -794,11 +794,11 @@ def install_package(pkg, force_install=False, install_dependencies=True):
         print "Installing dependencies for %s..." % pkg_name
         for dep in get_dependencies(pkg_name):
             install_package(dep, force_install)
-
     if pkg.endswith(".spkg") or pkg.endswith(".deb"):
         without_ext = os.path.splitext(os.path.basename(pkg))[0]
     else:
-        pkg = add_version_to_generic_name(pkg)
+        if(not(re.match("[^0-9]", pkg_version))):
+          pkg = add_version_to_generic_name(pkg)
         without_ext = pkg
 
     try:
