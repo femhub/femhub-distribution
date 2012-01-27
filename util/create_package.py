@@ -67,6 +67,10 @@ def rewrite_file(file):
 
 
 def generate_package(dir):
+    if(os.path.isabs(dir)):
+        (head, tail) = os.path.split(dir)
+        print(head)
+        os.chdir(head)
     make_tarball(os.path.basename(dir) + ".spkg", os.path.basename(dir))
 
 def generate_install_script(dir):
