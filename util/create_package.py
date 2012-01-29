@@ -4,7 +4,7 @@ import os
 import sys
 import argparse
 from spkg2deb.archive import make_tarball
-
+from spkg2deb.command import process_command
 
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
@@ -16,9 +16,13 @@ def main():
     print("Create FEMhub package from project source")
     print("=========================================")
     print("")
+    print("Example: ./create_package.py -d /project/source -u user@femhub.org")
+    print("")
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dir', action='append',
-    help='input directory containing source files')
+    help='input directory containing source files'),
+    parser.add_argument('-u', '--upload', action='append',
+    help='-u {username} , uploads the package on femhub.org')
 
     args = parser.parse_args()
 
@@ -48,6 +52,10 @@ def main():
                 print(e)
                 print('Skipping source: ' + dir)
 
+            if args.upload != None:
+                for account in args.upload:
+                    process_command(["scp", getPackageName(dir) + ".spkg",account + "@spilka.math.unr.edu:/var/www3/femhub.org/packages/femhub_st/femhub_spkg/"])
+                
 
 def rewrite_file(file):
     fin = open(file)
@@ -66,12 +74,24 @@ def rewrite_file(file):
     fout.close()
 
 
+def getPackageName(dir):
+    (head, tail) = os.path.split(dir)
+    return tail
+
+
 def generate_package(dir):
-    if(os.path.isabs(dir)):
+    if (dir.endswith("/")):
+        dir = dir[:-1]
+
+    finalArgument = getPackageName(dir)
+    try:
+        make_tarball(getPackageName(dir) + ".spkg", finalArgument)
+    except:
         (head, tail) = os.path.split(dir)
-        print(head)
-        os.chdir(head)
-    make_tarball(os.path.basename(dir) + ".spkg", os.path.basename(dir))
+        make_tarball(getPackageName(dir) + ".spkg", finalArgument, head)
+        process_command(["mv",os.path.join(head,getPackageName(dir) + ".spkg"),"./"]) 
+
+    print("Created package using: tar -cjf " + getPackageName(dir) + ".spkg " + finalArgument) 
 
 def generate_install_script(dir):
     makeLines = []
