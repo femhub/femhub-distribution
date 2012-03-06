@@ -62,9 +62,9 @@ Only use this mode to install FEMhub.
     parser.add_option("-i", "--install",
             action="store", type="str", dest="install", metavar="PACKAGE",
             default="", help="install a spkg package")
-    parser.add_option("-u", "--uninstall",
-            action="store", type="str", dest="uninstall", metavar="PACKAGE",
-            default="", help="uninstall a spkg package")
+    parser.add_option("-u", "--update",
+            action="store", type="str", dest="update", metavar="PACKAGE",
+            default="", help="update a spkg package")
     parser.add_option("-f", "--force",
             action="store_true", dest="force",
             default=False, help="force the installation")
@@ -151,9 +151,11 @@ Only use this mode to install FEMhub.
         except PackageBuildFailed:
             pass
         return
-    if options.uninstall:
+    if options.update:
         try:
-            uninstall_package(options.uninstall)
+            setup_cpu(options.cpu_count)
+            uninstall_package(options.update)
+            install_package(options.update, force_install=options.force)
         except:
             pass
         return
@@ -396,6 +398,8 @@ def uninstall_package(pkg):
     femhub_root = os.getenv('FEMHUB_ROOT')
 
     path = os.path.join(femhub_root, "spkg/installed", pkg)
+    f_spkg = os.path.join(femhub_root, "spkg/standard/femhub_spkg", pkg + ".spkg")
+    f_deb = os.path.join(femhub_root, "spkg/standard/femhub_deb", pkg + ".deb")
 
     def get_items2remove(path):
         items2remove = {'DIR': [], 'FILE': []}
@@ -426,7 +430,14 @@ def uninstall_package(pkg):
         items2remove = get_items2remove(path)
 
         if items2remove == None:
-            print "This Package do not support uninstall, delete it manually .."
+            print("Removing: %s" % path)
+            os.unlink(path)
+            if os.path.exists(f_spkg):
+                print("Removing: %s" % f_spkg)
+                os.unlink(f_spkg)
+            if os.path.exists(f_deb):
+                print("Removing: %s" % f_deb)
+                os.unlink(f_deb)
         else:
             print "Unistalling package ..."
 
@@ -440,6 +451,8 @@ def uninstall_package(pkg):
                     os.unlink(f)
 
                 os.unlink(path)
+                os.unlink(f_spkg)
+                os.unlink(f_deb)
 
                 print "Package Uninstalled .."
             except Exception:
