@@ -87,7 +87,10 @@ def generate_package(dir):
     try:
         make_tarball(getPackageName(dir) + ".spkg", finalArgument)
     except:
+        print("OK: tar did not find the path %s" % finalArgument)
         (head, tail) = os.path.split(dir)
+        print("Found project directory under: %s" % head)
+        print("Continuing...this may take a while!")
         make_tarball(getPackageName(dir) + ".spkg", finalArgument, head)
         process_command(["mv",os.path.join(head,getPackageName(dir) + ".spkg"),"./"]) 
 
