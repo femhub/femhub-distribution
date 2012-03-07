@@ -32,6 +32,7 @@ def main():
         exit(1)
 
     installScriptFound = False
+    packageName = False
 
     if args.dir != None:
         for dir in args.dir:
@@ -43,18 +44,18 @@ def main():
             try:
                 if installScriptFound:
                     print("spkg-install found!")
-                    generate_package(dir)
+                    packageName = generate_package(dir)
                 else:
                     print("spkg-install not found, trying to autogenerate...")
                     generate_install_script(dir)
-                    generate_package(dir)
+                    packageName = generate_package(dir)
             except RuntimeError as e:
                 print(e)
                 print('Skipping source: ' + dir)
 
-            if args.upload != None:
+            if args.upload != None and packageName != False:
                 for account in args.upload:
-                    process_command(["scp", getPackageName(dir) + ".spkg",account + "@spilka.math.unr.edu:/var/www3/femhub.org/packages/femhub_st/femhub_spkg/"])
+                    process_command(["scp", packageName + ".spkg",account + "@spilka.math.unr.edu:/var/www3/femhub.org/packages/femhub_st/femhub_spkg/"])
                 
 
 def rewrite_file(file):
@@ -95,6 +96,7 @@ def generate_package(dir):
         process_command(["mv",os.path.join(head,getPackageName(dir) + ".spkg"),"./"]) 
 
     print("Created package using: tar -cjf " + getPackageName(dir) + ".spkg " + finalArgument) 
+    return finalArgument
 
 def generate_install_script(dir):
     makeLines = []
